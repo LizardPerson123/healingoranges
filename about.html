@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About</title>
+  <link rel="stylesheet" href="main.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/icon-x" href="favicon.ico">
+  <link rel="stylesheet" href="dropdown.css">
+
+  <style id="styleTag"></style>
+  <style>li {font-size: 2em;} button {background-color: rgb(32, 196, 32);}</style>
+
+  <script>
+    window.addEventListener("DOMContentLoaded", function() {
+      const urlParams = new URLSearchParams(window.location.search)
+      const origin = urlParams.get('origin')
+
+      if (origin) {
+        getById("one").style.display = "none"
+        getById(origin).style.display = "block"
+      }
+    })
+
+    window.addEventListener("popstate", function(event) {
+      window.location.reload()
+    })
+  </script>
+</head>
+<body>
+</head>
+<body>
+  <div id="dropdiv" style="position: absolute; top: 0px; left: 10px;">
+    <div class="dropdown">
+    <button class="dropbtn">Options</button>
+      <div class="dropdown-content">
+        <a href="javascript:toggleMode()">Mode</a>
+        <a href="settings.html">Accounts</a>
+        <a href="index.html">Home</a>
+      </div>
+    </div>
+  </div>
+  
+  <div id="one">
+    <img src="favicon.ico" style="width: 8em; image-rendering: pixelated;">
+    <h1>About</h1>
+    <p id="subtext" style="color: darkgoldenrod;">It Exists!</p>
+
+    <p>Rotting Pears Is A Website With A Bunch Of Unique Web Games</p>
+    <p>The Website Has Singleplayer Games, But Also Has Multiplayer</p>
+    <p style="color: gray;"><i>Version Beta 1.0.0</i></p>
+    <p>Click On Any Of The Following To Learn More About It</p>
+    <button onclick="getById('one').style.display = 'none'; getById('two').style.display = 'block'; history.pushState({}, '', '?origin=two')">Games</button>
+    <button onclick="getById('one').style.display = 'none'; getById('three').style.display = 'block'; history.pushState({}, '', '?origin=three')">Accounts</button>
+    <button onclick="getById('one').style.display = 'none'; getById('five').style.display = 'block'; history.pushState({}, '', '?origin=five')">Rules</button>
+    <button onclick="getById('one').style.display = 'none'; getById('six').style.display = 'block'; history.pushState({}, '', '?origin=six')">Bans</button>
+    <button onclick="getById('one').style.display = 'none'; getById('four').style.display = 'block'; history.pushState({}, '', '?origin=four')">QnA</button>
+  </div>
+
+  <div id="two" style="display: none; margin-right: 8em;">
+    <img src="favicon.ico" style="width: 8em; image-rendering: pixelated;">
+    <h1>Games</h1>
+    <p>Rotting Pears Currently Offers 3 Games</p>
+    <ul style="display: flex; flex-direction: column; align-items: center;">
+      <li>Ebola Words</li>
+      <li>Card Games</li>
+      <li>Rotting Roulette</li>
+    </ul>
+    <h2 style="margin-top: 2em;">Ebola Words</h2>
+    <p>Ebola Words Is A Highscore Game That's More Interesting Than It Looks</p>
+    <p>In Ebola Words, You Have Text That Gets Ebola, And You Must Cure The Words By Clicking Them</p>
+    <p>If 10 Words Get Ebola, You Lose</p>
+    <button onclick="window.location.href = '/eb?origin=about'">More Info</button>
+    <h2 style="margin-top: 2em;">Card Games</h2>
+    <p>Card Games Is A Collection Of 3 Classic Card Games</p>
+    <p>Those Games Are Blackjack, Slapjack, And War</p>
+    <button onclick="window.location.href = 'about-cardgame.html'">More Info</button>
+    <h2 style="margin-top: 2em;">Rotting Roulette</h2>
+    <p>Rotting Roulette Is A Game Where You Fight Other Players With Bullets And Alcohol</p>
+    <p>In The Game, You Try To Shoot Other Players To Kill Them</p>
+    <p>When You Shoot Someone, It Will Either Be Live, Alcohol Or Blank</p>
+    <p>Alcohol Is An Item That Gives You A Special Effect</p>
+    <p>There Are Many Different Types Of Alcohol That Give Different Effects</p>
+    <p>Rotting Roulette Lets You Get Drunk In Many Unique Ways</p>
+    <button onclick="window.location.href = '/rr?origin=about'">More Info</button>
+
+    <h2 style="margin-top: 2em;">More Info</h2>
+    <p>If You Have An Account, You Get Several Extra Benefits With Games</p>
+    <p>First Of All, You Can Play Multiplayer</p>
+    <p>In Multiplayer, You Can Play With Up To 4 Other Players (Except For Some Games)</p>
+    <p>Multiplayer Is Supported On Card Games And Rotting Roulette</p>
+    <p>If You Have An Account, You Can Also Earn XP And Achievements</p>
+    <p>The More You Play On Rotting Pears, You More XP You Earn</p>
+    <p>With More XP, Your Account Will Level Up (Very Epic)</p>
+    <p>Achievements Are Rewards You Get For Doing Specific Things On Games</p>
+    <button onclick="getById('two').style.display = 'none'; getById('three').style.display = 'block'; history.pushState({}, '', '?origin=three')">More About Accounts</button>
+    <button onclick="window.location.href = 'settings.html?origin=two'">Create An Account</button>
+  </div>
+
+  <div id="three" style="display: none; margin-right: 8em;">
+    <img src="favicon.ico" style="width: 8em; image-rendering: pixelated;">
+    <h1>Accounts</h1>
+    <p>Rotting Pears Offers A Never Ever Before Seen Technology: Accounts</p>
+    <p>On Rotting Pears, You Can Create An Account To Get Additional Benefits</p>
+    <p>First Of All, Accounts Can Play Multiplayer</p>
+    <p>In Multiplayer, You Can Play With Up To 4 Other Players (Except For Some Games)</p>
+    <p>Multiplayer Is Supported On Card Games And Rotting Roulette</p>
+    <p>If You Have An Account, You Can Also Earn XP And Achievements</p>
+    <p>The More You Play On Rotting Pears, You More XP You Earn</p>
+    <p>With More XP, Your Account Will Level Up (Very Epic)</p>
+    <p>Achievements Are Rewards You Get For Doing Specific Things</p>
+    <p>They Give XP, And Are Visible To Anyone On The Website</p>
+    <p>You Can See Your Achievements On Your Account Page</p>
+    <p>Note: Your Account Must Be At Least 7 Days Old To Get XP, Achievements, And Levels</p>
+    <h2 style="margin-top: 2em;">Important Notes</h2>
+    <p>Accounts <span style="color: red; font-weight: 900;">CANNOT</span> Be Recovered If You Forget Your Password</p>
+    <p>You <span style="color: red; font-weight: 900;">CANNOT</span> Change Your Name Once You Make An Account</p>
+    <p>Do Not Break The Rules, Rule Breakers Will Be Deleted</p>
+    <p>If An Account Breaks The Rules, Report It <span style="font-weight: 900; color: blueviolet;">DURING THE ACT</span></p>
+    <button onclick="window.location.href = 'settings.html?origin=two'">Create An Account</button>
+    <button onclick="window.location.href = 'about.html?origin=five'">The Rules</button>
+  </div>
+
+  <div id="four" style="display: none; margin-right: 8em;">
+    <img src="favicon.ico" style="width: 8em; image-rendering: pixelated;">
+    <h1>Infrequently Asked Questions</h1>
+    <p style="margin-bottom: 0px; color: green;">Q: Are There Ads?</p>
+    <p style="margin-top: 0px; color: red;">A: No</p>
+
+    <p style="margin-bottom: 0px; color: green;">Q: Will There Be More Stuff Added?</p>
+    <p style="margin-top: 0px; color: red;">A: Yes, A Lot</p>
+
+    <p style="margin-bottom: 0px; color: green;">Q: Is This Supported On Mobile?</p>
+    <p style="margin-top: 0px; color: red;">A: Yes</p>
+
+    <p style="margin-bottom: 0px; color: green;">Q: Does Anything Cost Money?</p>
+    <p style="margin-top: 0px; color: red;">A: No</p>
+
+    <p style="margin-bottom: 0px; color: green;">Q: Why Is It Called Rotting Pears?</p>
+    <p style="margin-top: 0px; color: red;">A: It's A Parody Of Apple</p>
+
+    <p style="margin-bottom: 0px; color: green;">Q: Are The Games Fun?</p>
+    <p style="margin-top: 0px; color: red;">A: No</p>
+
+    <p style="margin-bottom: 0px; color: green;">Q: Will It Save My Marriage?</p>
+    <p style="margin-top: 0px; color: red;">A: Trick Question, You're Divorced</p>
+
+    <p style="margin-bottom: 0px; color: green;">Q: How Do I Create An Account?</p>
+    <a href="settings.html?origin=two" style="margin-top: 0px; color: red;">A: By Creating One</a>
+  </div>
+
+  <div id="five" style="margin-right: 8em; display: none;">
+    <img src="favicon.ico" style="width: 8em; image-rendering: pixelated;">
+    <h1>Rules</h1>
+    <p>Be Kind</p>
+    <p>Don't Cheat</p>
+    <p>Don't Be Political</p>
+    <p>Don't Bully People</p>
+    <p>Don't Insult Any Religions, Races, Or Sexualities</p>
+    <p>Don't Break The Law</p>
+    <p>Have Fun</p>
+    <p>Rule Breakers Will Be Temporarily Banned, Repeat Offenders Will Be Permanently Banned</p>
+  </div>
+
+  <div id="six" style="margin-right: 8em; display: none;">
+    <img src="favicon.ico" style="width: 8em; image-rendering: pixelated;">
+    <h1>Bans</h1>
+    <p>Rotting Pears Will Give Rule Breakers Bans For A Temporary Amount Of Time</p>
+    <p>When Your Account Is Banned, It Will No Longer Able To:</p>
+
+    <ul style="display: flex; flex-direction: column; align-items: center;">
+      <li>Submit To Leaderboards</li>
+      <li>Play Multiplayer</li>
+      <li>Earn XP And Achievements</li>
+    </ul>
+
+    <p>Rotting Pears Gives Bans For Different Lengths Of Time Depending On What Action Occured</p>
+    <p>Bans Are Given By The Rotting Pears Anti-Cheat (RPAC), As Well As By Mods</p>
+    <p>If You Are Banned, Make Sure You Aren't Breaking Any Rules</p>
+    <p>If You Are <span style="font-weight: 900;">ABSOLUTELY</span> Sure You Haven't Broken Any Rules, It Is Possible Your Account Was Falsely Labeled For Breaking A Rule</p>
+    <p>If Your Account Is Banned Multiple Times, It Will Be <span style="font-weight: 900;">Permanently</span> Banned</p>
+    <p><span style="font-weight: 900;">DO NOT</span> Create Multiple Accounts To Evade Bans</p>
+  </div>
+
+  <div id="sidebar" style="position: fixed; height: 100vh; right: 0px; top: 0px; padding-left: 1em; padding-right: 1em;">
+    <div style="display: flex; flex-direction: column; justify-content: center; text-align: center; align-items: center; cursor: pointer;" onclick="window.location.href = 'index.html';" class="sidebarOp">
+      <img src="images/house.svg" style="width: 100%; image-rendering: pixelated;">
+      <p style="font-size: 200%;">Home</p>
+    </div>
+
+    <div style="display: flex; flex-direction: column; justify-content: center; text-align: center; align-items: center; cursor: pointer;" onclick="window.location.href = 'settings.html';" class="sidebarOp">
+      <img src="images/account.svg" style="width: 100%; image-rendering: pixelated;">
+      <p style="font-size: 200%;">Accounts</p>
+    </div>
+
+    <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer;" class="sidebarOp">
+      <img src="images/moon.svg" style="width: 100%; image-rendering: pixelated;" id="imgMode" onclick="toggleMode()">
+      <p style="font-size: 200%;">Mode</p>
+    </div>
+  </div>
+
+  <script src="utility.js"></script>
+  <script src="index.js"></script>
+</body>
+</html>

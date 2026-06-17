@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Achievements</title>
+
+  <link rel="stylesheet" href="main.css">
+  <link rel="stylesheet" href="dropdown.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/icon-x" href="favicon.ico">
+
+  <style id="styleTag"></style>
+
+  <script>
+    let currentLowerLimit
+    let currentUpperLimit
+    let currentCategory
+    let currentType
+
+    async function getAchievements(lowerLimit, upperLimit, category="blackjack", type=0) {
+      currentLowerLimit = lowerLimit
+      currentUpperLimit = upperLimit
+      currentCategory = category
+      currentType = type
+      let displayCategory = category
+
+      if (category == "rotRoul") {displayCategory = "Rotting Roulette"}
+      if (category == "ebola") {displayCategory = "Ebola Words"}
+
+      getById("category").innerHTML = "Current Category: " + titleCase(displayCategory)
+
+      let achi = await fetch("https://api.rottingpears.com/achiAll?l=" + lowerLimit + "&ul=" + upperLimit + "&c=" + category + "&t=" + type)
+      achi = await achi.json()
+      achi.forEach(function(achi) {
+        console.log(achi)
+        let trophy = "bronze"
+        switch (achi[1].trophyLevel) {
+          case (1): {trophy = "silver"; break}
+          case (2): {trophy = "gold"; break}
+        }
+
+        let id = `achiDiv${generateRandomCode(10, 0, 9)}`
+
+        let onClickEvents = []
+        Array.from(getById("achiList").querySelectorAll("div")).forEach(function(item) {onClickEvents.push([item.id, item.onclick])})
+
+        getById("achiList").innerHTML += `
+        <div class="achiDiv" id='${id}' style="display: flex; border: solid; border-color: #b5b5b5; padding-left: 5px; padding-right: 20px; gap: 5px; background: none; cursor: pointer">
+          <img src="images/${trophy}_trophy.png" id="achiImg" style="width: 5em; image-rendering: pixelated;">
+          <div style="display: flex; align-items: center">
+            <p style="font-size: 1.3em;">${achi[0]}</p>
+          </div>
+        </div>`
+
+        onClickEvents.forEach(function(item) {
+          try {
+            getById(item[0]).onclick = item[1]
+          }
+          catch {}
+        })
+
+        getById(id).onclick = function() {alert(achi[1].desc)}
+      })
+    }
+
+    function goForwardAchi() {
+      if (getById("achiList").getElementsByClassName("achiDiv").length < 10) {
+        return
+      }
+
+      let id = "achiList"
+      getById(id).innerHTML = ""
+      let name = undefined
+      let lowerLimit = currentLowerLimit + 10
+      let upperLimit = currentUpperLimit + 10
+
+      getAchievements(name, lowerLimit, upperLimit, id)
+      getById('back').style.display = 'inline'
+    }
+    
+    function goBackAchi() {
+      if (currentLowerLimit < 1) {return}
+      
+      let id = "achiList"
+      getById(id).innerHTML = ""
+      let name = undefined
+      let lowerLimit = currentLowerLimit - 10
+      let upperLimit = currentUpperLimit - 10
+      getAchievements(name, lowerLimit, upperLimit, id)
+
+      if (currentLowerLimit < 1) {getById('back').style.display = 'none'}
+    }
+
+    window.addEventListener("DOMContentLoaded", async function() {
+      let lowerLimit = 0
+      let upperLimit = 10
+
+      getAchievements(lowerLimit, upperLimit)
+    })
+  </script>
+</head>
+<body>
+  <img src="favicon.ico" style="width: 8em; image-rendering: pixelated;">
+  <h1>Achievements</h1>
+  <p id="category" style="margin-bottom: 0px;">Current Category: </p>
+  <div style="margin-bottom: 40px;">
+    <div>
+      <button id="blackjack" style="font-size: 1.2em; box-shadow: none; border-radius: 0.5em; background-color: rgb(32, 196, 32);" onclick="getById('achiList').innerHTML = ''; getAchievements(0, 10, 'blackjack', currentType)">Blackjack</button>
+      <button id="slapjack" style="font-size: 1.2em; box-shadow: none; border-radius: 0.5em; background-color: rgb(32, 196, 32);" onclick="getById('achiList').innerHTML = ''; getAchievements(0, 10, 'slapjack', currentType)">Slapjack</button>
+      <button id="war" style="font-size: 1.2em; box-shadow: none; border-radius: 0.5em; background-color: rgb(32, 196, 32);" onclick="getById('achiList').innerHTML = ''; getAchievements(0, 10, 'war', currentType)">War</button>
+      <button id="ebolaWords" style="font-size: 1.2em; box-shadow: none; border-radius: 0.5em; background-color: rgb(32, 196, 32);" onclick="getById('achiList').innerHTML = ''; getAchievements(0, 10, 'ebola', currentType)">Ebola Words</button>
+      <button id="rottingRoulette" style="font-size: 1.2em; box-shadow: none; border-radius: 0.5em; background-color: rgb(32, 196, 32);" onclick="getById('achiList').innerHTML = ''; getAchievements(0, 10, 'rotRoul', currentType)">Rotting Roulette</button>
+    </div>
+    <div>
+      <button id="t0" style="font-size: 1.2em; box-shadow: none; border-radius: 0.5em; background-color: rgb(32, 196, 32);" onclick="getById('achiList').innerHTML = ''; getAchievements(0, 10, currentCategory, 0)">Bronze</button>
+      <button id="t1" style="font-size: 1.2em; box-shadow: none; border-radius: 0.5em; background-color: rgb(32, 196, 32);" onclick="getById('achiList').innerHTML = ''; getAchievements(0, 10, currentCategory, 1)">Silver</button>
+      <button id="t2" style="font-size: 1.2em; box-shadow: none; border-radius: 0.5em; background-color: rgb(32, 196, 32);" onclick="getById('achiList').innerHTML = ''; getAchievements(0, 10, currentCategory, 2)">Gold</button>
+    </div>
+  </div>
+  <div id="achiList" style="display: flex; flex-direction: column; align-items: center; gap: 20px;"></div>
+  <button id="back" style="box-shadow: none; background-color: rgb(32, 196, 32); display: none;" onclick="goBackAchi()">Back</button>
+  <button style="box-shadow: none; background-color: rgb(32, 196, 32);" onclick="goForwardAchi()">View More</button>
+
+  <div id="sidebar" style="position: fixed; height: 100vh; right: 0px; top: 0px; padding-left: 1em; padding-right: 1em;">
+    <div style="display: flex; flex-direction: column; justify-content: center; text-align: center; align-items: center; cursor: pointer;" onclick="window.location.href = 'index.html';" class="sidebarOp">
+      <img src="images/house.svg" style="width: 100%; image-rendering: pixelated;">
+      <p style="font-size: 200%;">Home</p>
+    </div>
+
+    <div style="display: flex; flex-direction: column; justify-content: center; text-align: center; align-items: center; cursor: pointer;" onclick="window.location.href = 'settings.html';" class="sidebarOp">
+      <img src="images/account.svg" style="width: 100%; image-rendering: pixelated;">
+      <p style="font-size: 200%;">Accounts</p>
+    </div>
+
+    <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer;" class="sidebarOp">
+      <img src="images/moon.svg" style="width: 100%; image-rendering: pixelated;" id="imgMode" onclick="toggleMode()">
+      <p style="font-size: 200%;">Mode</p>
+    </div>
+  </div>
+
+  <script src="utility.js"></script>
+  <script src="main.js"></script>
+  <script src="index.js"></script>
+</body>
+</html>

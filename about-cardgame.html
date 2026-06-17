@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About Card Games</title>
+  <link rel="stylesheet" href="main.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/icon-x" href="favicon.ico">
+  <link rel="stylesheet" href="dropdown.css">
+
+  <style id="styleTag"></style>
+  <style>li {font-size: 2em;}</style>
+</head>
+<body>
+  <div id="dropdiv" style="position: absolute; top: 0px; left: 10px;">
+    <div class="dropdown">
+    <button class="dropbtn">Options</button>
+      <div class="dropdown-content">
+        <a href="javascript:toggleMode()">Mode</a>
+        <a href="settings.html">Accounts</a>
+        <a href="index.html">Home</a>
+      </div>
+    </div>
+  </div>
+
+  <img src="images/cardgame.png" style="width: 8em; image-rendering: pixelated;">
+  <h1>About</h1>
+  <p>Card Games Is A Collection Of 3 Classic Card Games</p>
+  <p>Those Games Are Blackjack, Slapjack, And War</p>
+  <p>All Three Games Have Multiplayer</p>
+  <p>Blackjack And Slapjack Support Up To 5 Players</p>
+  <p>War Supports Up To 2 Players</p>
+  <p>Click Below For More Info On A Specific Card Game</p>
+  <button onclick="window.location.href = 'cg/blackjack/howtoplay.html?origin=about'">Blackjack</button>
+  <button onclick="window.location.href = 'cg/war/howtoplay.html?origin=about'">War</button>
+  <button onclick="window.location.href = 'cg/slapjack/howtoplay.html?origin=about'">Slapjack</button>
+
+  <div id="sidebar" style="position: fixed; height: 100vh; right: 0px; top: 0px; padding-left: 1em; padding-right: 1em;">
+    <div style="display: flex; flex-direction: column; justify-content: center; text-align: center; align-items: center; cursor: pointer;" onclick="window.location.href = 'index.html';" class="sidebarOp">
+      <img src="images/house.svg" style="width: 100%; image-rendering: pixelated;">
+      <p style="font-size: 200%;">Home</p>
+    </div>
+
+    <div style="display: flex; flex-direction: column; justify-content: center; text-align: center; align-items: center; cursor: pointer;" onclick="window.location.href = 'settings.html';" class="sidebarOp">
+      <img src="images/account.svg" style="width: 100%; image-rendering: pixelated;">
+      <p style="font-size: 200%;">Accounts</p>
+    </div>
+
+    <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer;" class="sidebarOp">
+      <img src="images/moon.svg" style="width: 100%; image-rendering: pixelated;" id="imgMode" onclick="toggleMode()">
+      <p style="font-size: 200%;">Mode</p>
+    </div>
+  </div>
+
+  <script src="utility.js"></script>
+  <script src="index.js"></script>
+</body>
+</html>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Card Games</title>
+  <link rel="stylesheet" href="main.css">
+  <link rel="stylesheet" href="dropdown.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/icon-x" href="favicon.ico">
+
+
+  <style id="styleTag"></style>
+
+  <script>
+    addEventListener("pageshow", function() {
+      getById("thisAccount").innerText = "Current Account: " + (localStorage.getItem("username") || "None")
+    })
+  </script>
+
+</head>
+<body>
+  <img src="images/cardgame.png" style="width: 8em; image-rendering: pixelated;">
+  <h1>Card Games</h1>
+  
+  <div id="dropdiv" style="position: absolute; top: 0px; left: 10px;">
+    <div class="dropdown">
+    <button class="dropbtn">Options</button>
+      <div class="dropdown-content">
+        <a href="javascript:toggleMode()">Mode</a>
+        <a href="settings.html">Accounts</a>
+        <a href="about.html">About</a>
+      </div>
+    </div>
+  </div>
+
+  <p style="color: darkgoldenrod;">Classic Card Games!</p>
+
+  <div style="display: flex; justify-content: center; gap: 3em; flex-wrap: wrap;" id="menu">
+    <div style="background-color: white; width: 16em;" class="option">
+      <img src="images/blackjack.png" style="width: 8em; image-rendering: pixelated;">
+      <p style="color: black;">Blackjack</p>
+      <button style="background-color: black; color: white;" onclick="window.location.href = 'cg/blackjack/howtoplay.html?origin=rotpear'">Info</button>
+    </div>
+
+    <div style="background-color: white; width: 16em;" class="option">
+      <img src="images/war.png" style="width: 8em; image-rendering: pixelated;">
+      <p style="color: black;">War</p>
+      <button style="background-color: black; color: white;" onclick="window.location.href = 'cg/war/howtoplay.html?origin=rotpear'">Info</button>
+    </div>
+
+    <div style="background-color: white; width: 16em;" class="option">
+      <img src="images/slapjack.png" style="width: 8em; image-rendering: pixelated; background-color: black;">
+      <p style="color: black;">Slapjack</p>
+      <button style="background-color: black; color: white;" onclick="window.location.href = 'cg/slapjack/howtoplay.html?origin=rotpear'">Info</button>
+    </div>
+  </div>
+  
+  <div id="sidebar" style="position: fixed; height: 100vh; right: 0px; top: 0px; padding-left: 1em; padding-right: 1em;">
+    <div style="display: flex; flex-direction: column; justify-content: center; text-align: center; align-items: center; cursor: pointer;" onclick="window.location.href = 'index.html';" class="sidebarOp">
+      <img src="images/house.svg" style="width: 100%; image-rendering: pixelated;">
+      <p style="font-size: 200%;">Home</p>
+    </div>
+
+    <div style="display: flex; flex-direction: column; justify-content: center; text-align: center; align-items: center; cursor: pointer;" onclick="window.location.href = 'settings.html';" class="sidebarOp">
+      <img src="images/account.svg" style="width: 100%; image-rendering: pixelated;">
+      <p style="font-size: 200%;">Accounts</p>
+    </div>
+
+    <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer;" class="sidebarOp">
+      <img src="moon.svg" style="width: 100%; image-rendering: pixelated;" id="imgMode" onclick="toggleMode()">
+      <p style="font-size: 200%;">Mode</p>
+    </div>
+  </div>
+
+  <a id="about" style="position: fixed; color: gray;" href="about.html">About</a>
+  <p style="position: fixed; color: gray;" id="thisAccount">Current Account: None</p>
+  
+  <script src="utility.js"></script>
+  <script src="main.js"></script>
+  <script src="index.js"></script>
+</body>
+</html>

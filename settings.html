@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rotting Pears Beta</title>
+  <link rel="stylesheet" href="main.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/icon-x" href="favicon.ico">
+  <link rel="stylesheet" href="dropdown.css">
+  <style id="styleTag"></style>
+  <style>
+    #six p {cursor: pointer;}
+  </style>
+
+  <script>
+    let currentLowerLimit
+    let currentUpperLimit
+    let currentCategory
+    let currentType
+
+    async function createAccountApi(username, password) {
+      let res = await fetch('https://api.rottingpears.com/createAccount', {method: 'POST', body: JSON.stringify({username: username, password: password}), headers: {"Content-Type": "application/json"}})
+      return res.status
+    }
+
+    async function isAccountApi(username) {
+      return fetch(`https://api.rottingpears.com/isAccount?username=${username}`).then(res => res.text())
+    }
+
+    async function getDataApi(username) {
+      return fetch(`https://api.rottingpears.com/getInfo?name=${username}`).then(res => res.json())
+    }
+
+    async function getUsers(username) {
+      return fetch(`https://api.rottingpears.com/getUsers?name=${username}`).then(res => res.json())
+    }
+
+    addEventListener("pageshow", function() {
+      getById("currentAccount").innerText = "Current Account: " + (localStorage.getItem("username") || "None")
+    })
+
+    async function makeAccount() {
+      let username = getById("username").value
+      let password = getById("password").value
+
+      let status = await createAccountApi(username, password)
+
+      if (status == 200) {
+        alert("Account Created")
+
+        localStorage.setItem("username", username)
+        localStorage.setItem("password", password)
+        
+        history.pushState({}, '', "?origin=one")
+        window.location.reload()
+      }
+      else if (status == 400) {
+        alert("Account Already Exists")
+      }
+      else {
+        alert("Something Happened")
+      }
+    }
+
+    async function logIn() {
+      let username = getById('username2').value
+      let password = getById('password2').value
+
+      let result = await isAccountApi(username)
+
+      if (result == "true") {
+        alert("Logged In")
+
+        localStorage.setItem("username", username)
+        localStorage.setItem("password", password)
+        
+        history.pushState({}, '', "?origin=one")
+        window.location.reload()
+      }
+      else {
+        alert("That Account Does Not Exist")
+      }
+    }
+
+    async function signOut() {
+      localStorage.setItem("username", "")
+      localStorage.setItem("password", "")
+      history.pushState({}, '', "?origin=one")
+      window.location.reload()
+    }
+
+    async function yourAccount() {
+      let username = localStorage.getItem("username")
+      if (!username || username == "") {alert("Not Logged In"); window.location.reload()}
+
+      let user = await getDataApi(username)
+      try {user.name.a}
+      catch (err) {alert("Error Occured"); window.location.reload()}
+
+      getById("name").innerText = user.name
+      getById("level").innerText = "Level " + user.level
+      getById("dateMade").innerText = "Created On: " + user.date_joined
+      getById("xp").innerText = "XP: " + user.xp
+      
+      let lowerLimit = 0
+      let upperLimit = 4
+      let id = "achiList2"
+
+      getAchievements(username, lowerLimit, upperLimit, id)
+      if (user.is_banned) {
+        getById("banned").style.display = "block"
+        getById("ban_undo").style.display = "block"
+        getById("ban_undo").innerText = "Unban Date: " + user.ban_undo
+        getById("aboutBans").style.display = "inline"
+      }
+    }
+
+    async function viewAccounts() {
+      let accounts = await getUsers(getById("search").value)
+
+      accounts.forEach(function(account) {
+        getById("six").innerHTML += `<p onclick="getById(\'six\').style.display = \'none\'; getById(\'seven\').style.display = \'flex\'; seeAccounts('${account}'); history.pushState({}, '', '?origin=seven&a=${account}')">${account}</p>`
+      })
+
+      if (accounts.length < 1) {alert("Sorry, Can't Find Any Accounts"); window.location.reload()}
+    }
+
+    async function seeAccounts(name) {
+      if (!name) {
+        const urlParams = new URLSearchParams(window.location.search)
+        name = urlParams.get('a')
+      }
+
+      let user = await getDataApi(name)
+
+      getById("name2").innerText = user.name
+      getById("level2").innerText = "Level " + user.level
+      getById("dateMade2").innerText = "Created On: " + user.date_joined
+      getById("xp2").innerText = "XP: " + user.xp
+
+      let lowerLimit = 0
+      let upperLimit = 4
+      let id = "achiList3"
+      getAchievements(user.name, lowerLimit, upperLimit, id)
+    }
+
+    function keyPressSearch() {
+      document.addEventListener('keydown', onKeyHandler)
+      function onKeyHandler(e) {
+        if (e.keyCode === 13) {
+          getById('five').style.display = 'none'
+          getById('six').style.display = 'block'
+          viewAccounts()
+          document.removeEventListener("keydown", onKeyHandler)
+        }
+      }
+    }
+
+    async function getAchievements(name, lowerLimit, upperLimit, id, category='blackjack', type=0) {
+      currentLowerLimit = lowerLimit
+      currentUpperLimit = upperLimit
+      currentCategory = category
+      currentType = type
+
+      if (id == "achiList") {getById("category").innerHTML = "Current Category: " + titleCase(category)}
+
+      if (!name) {
+        const urlParams = new URLSearchParams(window.location.search)
+        name = urlParams.get('a')
+      }
+      
+      name = encodeURI(name)
+      let achi = await fetch("https://api.rottingpears.com/achi?l=" + lowerLimit + "&ul=" + upperLimit + "&n=" + name + "&c=" + currentCategory + "&t=" + currentType)
+
+      achi = await achi.json()
+      achi.forEach(function(achi) {
+        let trophy = "bronze"
+        switch (achi.type) {
+          case (1): {trophy = "silver"; break}
+          case (2): {trophy = "gold"; break}
+        }
+        
+        getById(id).innerHTML += `
+        <div class="achiDiv" onclick='alert("${achi.desc}")' style="display: flex; border: solid; border-color: #b5b5b5; padding-left: 5px; padding-right: 20px; gap: 5px; background: none; cursor: pointer">
+          <img src="images/${trophy}_trophy.png" id="achiImg" style="width: 5em; image-rendering: pixelated;">
+          <div style="display: flex; align-items: center">
+            <p style="font-size: 1.3em;">${achi.achievement_name}</p>
+          </div>
+        </div>`
+      })
+
+      if (achi.length == 0) {getById(id).innerHTML += "<i style='color: gray; font-size: 1.5em; margin-bottom: 0.5em'>No Achievements Here<i>"}
+    }
+    
+    function goForwardAchi() {
+      if (getById("achiList").getElementsByClassName("achiDiv").length < 10) {
+        return
+      }
+
+      let id = "achiList"
+      getById(id).innerHTML = ""
+      let name = undefined
+      let lowerLimit = currentLowerLimit + 10
+      let upperLimit = currentUpperLimit + 10
+
+      getAchievements(name, lowerLimit, upperLimit, id)
+      getById('back').style.display = 'inline'
+    }
+    
+    function goBackAchi() {
+      if (currentLowerLimit < 1) {return}
+      
+      let id = "achiList"
+      getById(id).innerHTML = ""
+      let name = undefined
+      let lowerLimit = currentLowerLimit - 10
+      let upperLimit = currentUpperLimit - 10
+      getAchievements(name, lowerLimit, upperLimit, id)
+
+      if (currentLowerLimit < 1) {getById('back').style.display = 'none'}
+    }
+    
+    window.addEventListener("DOMContentLoaded", function() {
+      const urlParams = new URLSearchParams(window.location.search)
+      const origin = urlParams.get('origin')
+
+      if (origin) {
+        getById("one").style.display = "none"
+        getById(origin).style.display = "block"
+
+        switch (origin) {
+          case ("four"): {getById("four").style.display = "flex"; yourAccount(); break}
+          case ("five"): {keyPressSearch(); break}
+          case ("seven"): {getById("seven").style.display = "flex"; seeAccounts(); break}
+          case ("eight"): {getAchievements(undefined, 0, 4, 'achiList')}
+        }
+      }
+    })
+
+    window.addEventListener("popstate", function(event) {
+      window.location.reload()
+    })
+  </script>
+
+</head>
+<body>
+  <div id="dropdiv" style="position: absolute; top: 0px; left: 10px;">
+    <div class="dropdown">
+    <button class="dropbtn">Options</button>
+      <div class="dropdown-content">
+        <a href="javascript:toggleMode()">Mode</a>
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+      </div>
+    </div>
+  </div>
+
+  <div id="one">
+    <img src="favicon.ico" style="width: 8em; image-rendering: pixelated;">
+    <h1>Accounts</h1>
+    <p id="currentAccount" style="margin-bottom: 15px;">Current Account: </p>
+    <div style="display: flex; justify-content: center; gap: 5em; flex-wrap: wrap; margin-right: 8em; margin-top: 2em;">
+    <div style="background-color: white; width: 16em;" onclick="getById('one').style.display = 'none'; getById('two').style.display = 'block'; history.pushState({}, '', '?origin=two');" class="option">
+      <img src="images/plus.svg" style="width: 8em; image-rendering: pixelated; margin-bottom: 2em; margin-top: 1em;">
+      <p style="color: black;">New Account</p>
+    </div>
+
+    <div style="background-color: white; width: 16em;" onclick="getById('one').style.display = 'none'; getById('three').style.display = 'block'; history.pushState({}, '', '?origin=three')" class="option">
+      <img src="images/signin.svg" style="width: 8em; image-rendering: pixelated; margin-bottom: 2em; margin-top: 1em;">
+      <p style="color: black;">Sign In</p>
+    </div>
+
+    <div style="background-color: white; width: 16em;" onclick="getById('one').style.display = 'none'; getById('four').style.display = 'flex'; yourAccount(); history.pushState({}, '', '?origin=four')" class="option">
+      <img src="images/settings.svg" style="width: 8em; image-rendering: pixelated; margin-bottom: 2em; margin-top: 1em;">
+      <p style="color: black;">Your Account</p>
+    </div>
+
+    <div style="background-color: white; width: 16em;" onclick="getById('one').style.display = 'none'; getById('five').style.display = 'block'; keyPressSearch(); history.pushState({}, '', '?origin=five')" class="option">
+      <img src="images/mglass.svg" style="width: 8em; image-rendering: pixelated; margin-bottom: 2em; margin-top: 1em;">
+      <p style="color: black;">Find Accounts</p>
+    </div>
+    </div>
+  </div>
+
+  <div id="two" style="display: none;">
+    <img src="favicon.ico" style="width: 8em; image-rendering: pixelated;">
+    <h1 style="margin-bottom: 1em">Make Account</h1>
+    <label for="username" style="font-size: 1.5em; margin-bottom: 10px;">Username:</label><br>
+    <input type="text" id="username" name="username" style="width: 60%; border: solid; margin-bottom: 2em; border-radius: 1.5em; font-size: 1.5em; padding-top: 10px; padding-bottom: 10px;"><br>
+    <label for="password" style="font-size: 1.5em; margin-bottom: 10px;">Password:</label><br>
+    <input type="text" id="password" name="password" style="width: 60%; border: solid; margin-bottom: 2em; border-radius: 1.5em; font-size: 1.5em; padding-top: 10px; padding-bottom: 10px;"><br>
+    
+    <button onclick="makeAccount()" style="background-color: rgb(32, 196, 32);">Make Account</button>
+  </div>
+
+  <div id="three" style="display: none;">
+    <img src="favicon.ico" style="width: 8em; image-rendering: pixelated;">
+    <h1 style="margin-bottom: 1em">Sign In</h1>
+    <label for="username2" style="font-size: 1.5em; margin-bottom: 10px;">Username:</label><br>
+    <input type="text" id="username2" name="username" style="width: 60%; border: solid; margin-bottom: 2em; border-radius: 1.5em; font-size: 1.5em; padding-top: 10px; padding-bottom: 10px;"><br>
+    <label for="password2" style="font-size: 1.5em; margin-bottom: 10px;">Password:</label><br>
+    <input type="text" id="password2" name="password" style="width: 60%; border: solid; margin-bottom: 2em; border-radius: 1.5em; font-size: 1.5em; padding-top: 10px; padding-bottom: 10px;"><br>
+
+    <button onclick="logIn()" style="background-color: rgb(32, 196, 32);">Sign In</button>
+  </div>
+
+  <div id="sidebar" style="position: fixed; height: 100vh; right: 0px; top: 0px; padding-left: 1em; padding-right: 1em;">
+    <div style="display: flex; flex-direction: column; justify-content: center; text-align: center; align-items: center; cursor: pointer;" onclick="window.location.href = 'index.html';" class="sidebarOp">
+      <img src="images/house.svg" style="width: 100%; image-rendering: pixelated;">
+      <p style="font-size: 200%;">Home</p>
+    </div>
+
+    <div style="display: flex; flex-direction: column; justify-content: center; text-align: center; align-items: center; cursor: pointer;" onclick="window.location.href = 'settings.html';" class="sidebarOp">
+      <img src="images/account.svg" style="width: 100%; image-rendering: pixelated;">
+      <p style="font-size: 200%;">Accounts</p>
+    </div>
+
+    <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer;" class="sidebarOp">
+      <img src="images/moon.svg" style="width: 100%; image-rendering: pixelated;" id="imgMode" onclick="toggleMode()">
+      <p style="font-size: 200%;">Mode</p>
+    </div>
+  </div>
+
+  <div id="four" style="display: none; flex-direction: column; align-items: center; gap:20px;">
+    <div style="width: max-content; display: flex; flex-direction: column; align-items: center; gap: 20px; padding-left: 2em; padding-right: 2em;">
+    <img src="favicon.ico" style="width: 8em; image-rendering: pixelated;">
+    <div style="width: 100%; border: solid; padding-left: 2em; padding-right: 2em;">
+      <h1 id="name">Account Name</h1>
+      <h2 style="margin-top: -0.3em;" id="level">Level: 1</h2>
+      <h2 style="margin-top: -0.3em; margin-bottom: 1em; color: red; display: none;" id="banned">BANNED</h2>
+    </div>
+    <div style="display: flex; flex-direction: column; align-items: center; border: solid; width: 100%; padding-bottom: 2em; padding-left: 2em; padding-right: 2em; gap: 20px" id="achiList2">
+      <h2 style="font-size: 4em;">Achievements</h2>
+    </div>
+    <div style="border: solid; width: 100%; padding-left: 2em; padding-right: 2em;">
+      <h2 style="font-size: 4em;">Extra</h2>
+      <p id="dateMade" style="margin-bottom: 0px;">Created On: 6/1/26</p>
+      <p id="xp">XP: 6</p>
+      <p id="ban_undo" style="color: red; display: none;">Unban Date: Sun May 31 2026</p>
+      <div style="padding-bottom: 2em;">
+        <button id="signOut" onclick="signOut()" style="background-color: rgb(32, 196, 32);">Sign Out</button>
+        <button style="background-color: rgb(32, 196, 32);" onclick="getById('four').style.display = 'none'; getById('eight').style.display = 'block'; getAchievements(getById('name').innerText, 0, 10, 'achiList'); history.pushState({}, '', '?origin=eight&a=' + localStorage.getItem('username'));">View Achievements</button>
+        <button id="aboutBans" onclick="window.location.href = 'about.html?origin=six'" style="background-color: red; display: none;">About Bans</button>
+      </div>
+    </div>
+    </div>
+  </div>
+
+  <div id="five" style="display: none;">
+    <img src="favicon.ico" style="width: 8em; image-rendering: pixelated;">
+    <h1 style="margin-bottom: 0.7em;">Find Account</h1>
+    <p>Search For An Account Below</p>
+    <input type="text" id="search" name="search" style="width: 60%; border: solid; margin-bottom: 1em; border-radius: 1.5em; font-size: 1.5em; padding-top: 10px; padding-bottom: 10px;"><br>
+    <button style="padding-left: 20px; padding-right: 20px; background-color: rgb(23, 204, 23);" onclick="getById('five').style.display = 'none'; getById('six').style.display = 'block'; viewAccounts();">Search</button>
+  </div>
+
+  <div id="six" style="display: none;">
+    <img src="favicon.ico" style="width: 8em; image-rendering: pixelated;">
+    <h1 style="margin-bottom: 0.7em;">Accounts Found</h1>
+  </div>
+
+  <div id="seven" style="display: none; flex-direction: column; align-items: center; gap:20px;">
+    <div style="width: max-content; display: flex; flex-direction: column; align-items: center; gap: 20px; padding-left: 2em; padding-right: 2em;">
+    <img src="favicon.ico" style="width: 8em; image-rendering: pixelated;">
+    <div style="width: 100%; border: solid; padding-left: 2em; padding-right: 2em;">
+      <h1 id="name2">Account Name</h1>
+      <h2 style="margin-top: -0.3em;" id="level2">Level: 1</h2>
+    </div>
+    <div style="display: flex; flex-direction: column; align-items: center; border: solid; width: 100%; padding-bottom: 2em; padding-left: 2em; padding-right: 2em; gap:20px" id="achiList3">
+      <h2 style="font-size: 4em;">Achievements</h2>
+    </div>
+    <div style="border: solid; width: 100%; padding-left: 2em; padding-right: 2em;">
+      <h2 style="font-size: 4em;">Extra</h2>
+      <p id="dateMade2" style="margin-bottom: 0px;">Created On: 6/1/26</p>
+      <p id="xp2">XP: 6</p>
+      <div style="padding-bottom: 2em;">
+        <button style="background-color: rgb(32, 196, 32);" onclick="getById('seven').style.display = 'none'; getById('eight').style.display = 'block'; getAchievements(getById('name2').innerText, 0, 10, 'achiList'); history.pushState({}, '', '?origin=eight&a=' + getById('name2').innerText);">View Achievements</button>
+      </div>
+    </div>
+    </div>
+  </div>
+
+  <div id="eight" style="display: none;">
+    <img src="favicon.ico" style="width: 8em; image-rendering: pixelated;">
+    <h1>Achievements</h1>
+    <p id="category" style="margin-bottom: 0px;">Current Category: </p>
+    <div style="margin-bottom: 40px;">
+      <div>
+        <button id="blackjack" style="font-size: 1.2em; box-shadow: none; border-radius: 0.5em; background-color: rgb(32, 196, 32);" onclick="getById('achiList').innerHTML = ''; getAchievements(undefined, 0, 10, 'achiList', 'blackjack', currentType)">Blackjack</button>
+        <button id="slapjack" style="font-size: 1.2em; box-shadow: none; border-radius: 0.5em; background-color: rgb(32, 196, 32);" onclick="getById('achiList').innerHTML = ''; getAchievements(undefined, 0, 10, 'achiList', 'slapjack', currentType)">Slapjack</button>
+      </div>
+      <div>
+        <button id="t0" style="font-size: 1.2em; box-shadow: none; border-radius: 0.5em; background-color: rgb(32, 196, 32);" onclick="getById('achiList').innerHTML = ''; getAchievements(undefined, 0, 10, 'achiList', currentCategory, 0)">Bronze</button>
+        <button id="t1" style="font-size: 1.2em; box-shadow: none; border-radius: 0.5em; background-color: rgb(32, 196, 32);" onclick="getById('achiList').innerHTML = ''; getAchievements(undefined, 0, 10, 'achiList', currentCategory, 1)">Silver</button>
+        <button id="t2" style="font-size: 1.2em; box-shadow: none; border-radius: 0.5em; background-color: rgb(32, 196, 32);" onclick="getById('achiList').innerHTML = ''; getAchievements(undefined, 0, 10, 'achiList', currentCategory, 2)">Gold</button>
+      </div>
+    </div>
+
+    <div id="achiList" style="display: flex; flex-direction: column; align-items: center; gap: 20px;">
+      
+    </div>
+    <button id="back" style="box-shadow: none; background-color: rgb(32, 196, 32); display: none;" onclick="goBackAchi()">Back</button>
+    <button style="box-shadow: none; background-color: rgb(32, 196, 32);" onclick="goForwardAchi()">View More</button>
+    <button onclick="window.location.href = 'achi.html'" style="margin-bottom: 0px; box-shadow: none; background-color: rgb(32, 196, 32);">View All</button>
+  </div>
+  
+  <script src="utility.js"></script>
+  <script src="index.js"></script>
+</body>
+</html>
