@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Slapjack</title>
+  <style id="styleTag"></style>
+  <link rel="stylesheet" href="slapjack.css">
+  <link rel="stylesheet" href="../general.css">
+  <link rel="icon" type="image/icon-x" href="favicon.ico">
+
+  <script>
+    console.log("Version 2.00")
+    let playerCards = []
+    let cpuCards = []
+    let deckCards = []
+    let cpuSlap
+    let endTimeout
+    let resolveFunc
+    let offsetHeight
+    let automatic = false
+    let difficulty = 1
+    let cpuSlapSpeed = 1200
+    let allHitsByPlayer = true
+
+    function preLoadCard(card) {
+      if (!card) {return}
+      let img = new Image()
+      img.src = `../cards/${card[0]}-${card[1]}.svg`
+    }
+
+    function showCard(card, id) {
+      if (card[1] == 11) {
+        getById(id).innerHTML += `
+          <img id='cardImg' class='hoverCard' onclick='rightSlap()' width="100%" src='../cards/${card[0]}-${card[1]}.svg' >
+        `
+        return
+      }
+      getById(id).innerHTML += `<img width="100%" class='hoverCard' id='cardImg' onclick='wrongSlap()' src='../cards/${card[0]}-${card[1]}.svg' >`
+    }
+
+    function rightSlap() {
+      endTimeout()
+      alert("You Slapped!")
+      appendFromDeck(playerCards)
+      updateCardNum()
+      getById("cardImg").remove()
+    }
+
+    function wrongSlap() {
+      alert("That Was Not A Jack! You Lose 3 Cards")
+      for (let i = 0; i < 3; i++) {
+        if (playerCards.length > 0) {
+          cpuCards.push(playerCards[0])
+          removeItem(playerCards, playerCards[0])
+        }
+      }
+
+      achi.register("Not A Jack", "bronze")
+    }
+
+    function hideCard(id) {
+      getById(id).innerHTML = ''
+    }
+
+    function dealCards(firstCardSet, secondCardSet) {
+      firstCardSet = []
+      secondCardSet = []
+
+      for (let i = 1; i <= 26; i++) {
+        firstCardSet.push(generateCard())
+      }
+
+      for (let i = 1; i <= 26; i++) {
+        secondCardSet.push(generateCard())
+      }
+
+      return [firstCardSet, secondCardSet]
+    }
+
+    function dealCardsMulti(cardSets) {
+      let numberOfCards = Math.floor(52 / cardSets.length)
+
+      cardSets.forEach(function(set) {
+        for (let i = 0; i < numberOfCards; i++) {
+          set.push(generateCard())
+        }
+      })
+
+      return cardSets
+    }
+
+    async function startGame() {
+      achi.register("Play Slapjack", "bronze")
+
+      let cards = dealCards()
+      playerCards = cards[0]
+      cpuCards = cards[1]
+
+      switch (difficulty) {
+        case (1): {cpuSlapSpeed = 1200; break}
+        case (2): {cpuSlapSpeed = 1000; break}
+        case (3): {cpuSlapSpeed = 800; break}
+      }
+
+      if (automatic) {
+        switch (difficulty) {
+          case (1): {cpuSlapSpeed = 900; break}
+          case (2): {cpuSlapSpeed = 700; break}
+          case (3): {cpuSlapSpeed = 600; break}
+        }
+
+        achi.register("Play With Automatic Cards", "bronze")
+      }
+
+      getById("playerCardsNum").style.display = "block"
+      getById("cpuCardsNum").style.display = "block"
+      getById("deckCardsNum").style.display = "block"
+      if (!automatic) {getById("round").style.display = "inline"}
+      getById("round").innerText = "Place Card"
+      getById("round").removeAttribute("onclick")
+      getById("options").style.display = "none"
+      getById("imgMode").style.display = "none"
+
+      getById("playerCardsNum").innerHTML = "Your Cards: 26"
+      getById("cpuCardsNum").innerHTML = "CPU Cards: 26"
+      getById("deckCardsNum").innerHTML = "Deck Cards: 0"
+
+      getById("currentTurn").innerHTML = "Your Turn"
+
+      while(true) {
+        if (automatic) {await waitForPlayerInputAutomaticPlace(playerPlaceCard)}
+        else {await waitForPlayerInput(playerPlaceCard)}
+        await waitForCPUInput(cpuPlaceCard)
+      }
+    }
+
+    function chooseDifficulty() {
+      getById("currentTurn").style.display = "block"
+      getById("currentTurn").innerText = "Choose Difficulty"
+
+      getById("oneText").innerHTML = "Easy"
+      getById("twoText").innerHTML = "Normal"
+      getById("threeText").innerHTML = "Hard"
+
+      getById("one").onclick = () => {difficulty = 1; useAutomatic()}
+      getById("two").onclick = () => {difficulty = 2; useAutomatic()}
+      getById("three").onclick = () => {difficulty = 3; useAutomatic()}
+    }
+
+    function useAutomatic() {
+      getById("three").style.display = "none"
+      getById("currentTurn").innerText = "Automatically Place Your Cards?"
+
+      getById("oneText").innerHTML = "Yes"
+      getById("twoText").innerHTML = "No"
+
+      getById("two").onclick = () => {automatic = false; startGame()}
+      getById("one").onclick = () => {automatic = true; startGame()}
+    }
+
+    async function playerPlaceCard() {
+      let card = playerCards[0]
+      removeItem(playerCards, card)
+
+      deckCards.push(card)
+
+      updateCardNum()
+      preLoadCard(cpuCards[0])
+      
+      hideCard("card")
+      showCard(card, "card")
+
+      if (card[1] == 11) {
+        await enterCPUSlap()
+      }
+    }
+
+    async function cpuPlaceCard() {
+      hideCard("card")
+
+      let card = cpuCards[0]
+      removeItem(cpuCards, card)
+
+      deckCards.push(card)
+
+      updateCardNum()
+      preLoadCard(playerCards[0])
+      showCard(card, "card")
+
+      if (card[1] == 11) {
+        await enterCPUSlap()
+      }
+    }
+
+    function enterCPUSlap() {
+      return new Promise( (resolve) => {
+        resolveFunc = resolve
+        endTimeout = function() {
+          resolveFunc()
+          clearTimeout(cpuSlap)
+        }
+
+        cpuSlap = setTimeout(function() {
+          alert("CPU Slaps!")
+          allHitsByPlayer = false
+          appendFromDeck(cpuCards)
+          getById("cardImg").remove()
+          updateCardNum()
+          resolve()
+        }, cpuSlapSpeed)
+        
+      })
+    }
+
+    function waitForPlayerInput(callback = () => {}) {
+      getById("currentTurn").innerHTML = "Your Turn"
+      return new Promise(function(resolve) {
+        if (playerCards.length == 0) {
+          resolve()
+        }
+        else {
+          getById("round").addEventListener("click", async function clickEvent() {
+            await callback()
+            getById("round").removeEventListener("click", clickEvent)
+            resolve()
+          })
+        }
+      })
+    }
+
+    function waitForPlayerInputAutomaticPlace(callback = () => {}) {
+      getById("currentTurn").innerHTML = "Your Turn"
+      return new Promise(function(resolve) {
+        if (playerCards.length == 0) {
+          resolve()
+        }
+        else {
+          setTimeout(async function clickEvent() {
+            await callback()
+            getById("round").removeEventListener("click", clickEvent)
+            resolve()
+          }, getRndInteger(5, 10) * 100)
+        }
+      })
+    }
+
+    function waitForCPUInput(callback = () => {}) {
+      getById("currentTurn").innerHTML = "CPU Turn"
+      return new Promise(function(resolve) {
+        if (cpuCards.length == 0) {
+          resolve()
+        }
+        else {
+          let timeout = getRndInteger(5, 10) * 100
+
+          setTimeout(async function () {
+            await callback()
+            resolve()
+          }, timeout)
+        }
+      })
+    }
+
+    function appendFromDeck(receiver) {
+      deckCards.forEach(function(card) {
+        receiver.push(card)
+      })
+
+      deckCards = []
+    }
+
+    function updateCardNum() {
+      getById("playerCardsNum").innerHTML = `Your Cards: ${playerCards.length}`
+      getById("cpuCardsNum").innerHTML = `CPU Cards: ${cpuCards.length}`
+      getById("deckCardsNum").innerHTML = `Deck Cards: ${deckCards.length}`
+      
+      let won = "a"
+      if (playerCards.length == 52) {
+        alert("You Win")
+
+        if (allHitsByPlayer) {
+          if (difficulty == 1 || difficulty == 2) {achi.laterRegi("Hit Every Time (Easy And Normal)", "silver")}
+          else if (difficulty == 3) {achi.laterRegi("Hit Every Time (Hard)", "gold")}
+        }
+        
+        switch (difficulty) {
+          case(1): {achi.laterRegi("Win Slapjack (Easy Mode)", "bronze"); break}
+          case(2): {achi.laterRegi("Win Slapjack (Normal Mode)", "silver"); break}
+          case(3): {achi.laterRegi("Win Slapjack (Hard Mode)", "bronze"); break}
+        }
+
+        achi.laterRegi("Win Slapjack", "silver")
+
+        won = true
+      }
+      else if (cpuCards.length == 52) {
+        alert("CPU Wins")
+        won = false
+      }
+
+      if (won != "a") {
+        handleEnd(won)
+      }
+    }
+    
+    async function handleEnd(won) {
+      let t = 0
+      if (won) {t=1}
+
+      if (localStorage.getItem("username")) {
+        document.querySelector("body").innerText = "Please Wait..."
+              
+        try {
+          await fetch("https://api.rottingpears.com/xp", {
+            method: "POST",
+            body: JSON.stringify({
+              n: localStorage.getItem("username"),
+              p: localStorage.getItem("password"),
+              t: t
+            }),
+            headers: {
+              "Content-type": "application/json; charset=UTF-8"
+            }
+          })
+        }
+        catch {}
+      }
+
+      window.location.reload()
+    }
+    
+  </script>
+</head>
+<body>
+  <div id="chat" style="display: none;">
+   <h1 style="font-size: 3em; margin-top: 20px;">Chat</h1>
+   <button onclick="RottingExtension.setCurrentView('main')" class="optionButton" style="margin-bottom: 20px;">Go Back</button>
+   <div id="chatShow"></div>
+
+   <div style="display: flex; flex-direction: column; align-items: center; margin-bottom: 30px;">
+     <input style="border: solid; width: 80%; font-size: 2em; border-radius: 1em;" id="textMsgInput">
+   </div>
+
+   <button onclick="chat.register(thisPlayer, getById('textMsgInput').value); broadcast(JSON.stringify({msg: 'message', chat: getById('textMsgInput').value})); getById('textMsgInput').value = ''" class="optionButton">Send Message</button>
+
+   <script>
+    function keyPressSendMessage() {
+     document.addEventListener('keydown', onKeyHandler)
+     function onKeyHandler(e) {
+       if (e.keyCode === 13) {
+        chat.register(thisPlayer, getById('textMsgInput').value)
+        broadcast(JSON.stringify({msg: 'message', chat: getById('textMsgInput').value}))
+        getById("textMsgInput").value = ""
+       }
+     }
+    }
+
+    keyPressSendMessage()
+   </script>
+  </div>
+
+  <div id="achiLists" style="position: absolute; top: 20px; right: 0px; display: flex; flex-direction: column; gap: 20px">
+
+  </div>
+  
+  <div id="main">
+  <img id="imgMode" src="../sun.svg" style="position: absolute; right: 10px; top: 0px; width: 100px;" onclick="changeMode();">
+  <img src="favicon.ico" style="width: 7em; image-rendering: pixelated; background-color: black;">
+  <h1 id="iHaveACrushOn" style="margin-top: 0em; margin-bottom: 0.5em;">Slapjack</h1>
+  <h1 style="display: none;" id="currentTurn"></h1>
+
+  <div style="object-fit: cover; display: flex; justify-content: center; align-items: center; gap: 10px; flex-wrap: wrap;" id="options">
+    <div style="position: relative; text-align: center;" onclick="chooseDifficulty()" id="one">
+      <img style="image-rendering: pixelated;" class="gameOptionCards" src="../playingcardback.png">
+      <h3 style="font-size: 2.5em; color: black;" id="oneText" class="centerText">Singleplayer</h3>
+    </div>
+
+    <div style="position: relative; text-align: center;" onclick="multiplayerStart()" id="two">
+      <img style="image-rendering: pixelated;" class="gameOptionCards" src="../playingcardback.png">
+      <h3 style="font-size: 2.5em; color: black;" id="twoText" class="centerText" >Multiplayer</h3>
+    </div>
+
+    <div style="position: relative; text-align: center;" onclick="window.location.href = 'howtoplay.html'" id="three">
+      <img style="image-rendering: pixelated;" class="gameOptionCards" src="../playingcardback.png">
+      <h3 style="font-size: 2.5em; color: black;" id="threeText" class="centerText" >How To Play</h3>
+    </div>
+  </div>
+
+  <button id="round" class="optionButton" style="display: none;" onclick="startGame()">Start</button>
+  <button id="chatButton" style="display: none;" class="optionButton" onclick="chat.show()">Chat</button>
+  
+  <div id="cardNum" style="text-align: center;">
+    <p id="cpuCardsNum" class="infoText" style="display: none;">CPU Cards: </p>
+    <p id="playerCardsNum" class="infoText" style="display: none;">Your Cards: </p>
+    <p id="deckCardsNum" class="infoText" style="display: none;">Deck Cards: </p>
+  </div>
+  
+  <div id="cards" style="display: flex; justify-content: center; flex-wrap: wrap;">
+    <div id="outerCard" style="margin-top: 0.5em; width: 40%; background: none; ">
+      <div id="card" class="cardDeck">
+      </div>
+    </div>
+  </div>
+
+  <div style="display: none;" id="multiplayerNewMenu">
+    <h2 id="status"></h2>
+    <button style="margin-bottom: 20px; display: none;" id="startMultiplayerGame" class="optionButton" onclick="beginGameHost()">Start Game</button>
+    <div class="outerBoxDiv" style=" padding-top: 0.5em; padding-bottom: 1em;" id="usernames">
+      <h2 style="font-size: 1.7em;">Players</h2>
+    </div>
+  </div>
+
+  <div style="display: none;" id="multiplayerJoin">
+    <h1>Waiting To Start...</h1>
+    <h1 id="host"></h1>
+    <div class="outerBoxDiv" style="padding-top: 0.5em; padding-bottom: 1em;" id="usernames2">
+      <h2 style="font-size: 1.7em;">Players</h2>
+    </div>
+  </div>
+
+   <div style="display: none;" id="multiplayerMenu">
+      <h2 style="margin-bottom: 0.7em; margin-top: 5px;" id="whatDoing">Creating New Session</h2>
+      <div style="margin-bottom: 2em;">
+        <input type="button" id="new" name="joinOrNew" value="New Session" class="optionButton" style="display: none;">
+        <input type="button" id="join" name="joinOrNew" value="Join Session" class="optionButton"><br>
+      </div>
+      <label for="username" style="font-size: 1.5em; margin-bottom: 10px;">Username:</label><br>
+      <input type="text" id="username" name="username" style="width: 60%; margin-bottom: 2em; border-radius: 1.5em; font-size: 1.5em; padding-top: 10px; padding-bottom: 10px; border: solid;"><br>
+      <label for="password" style="font-size: 1.5em; margin-bottom: 10px;">Password:</label><br>
+      <input type="text" id="password" name="password" style="width: 60%; margin-bottom: 2em; border-radius: 1.5em; font-size: 1.5em; padding-top: 10px; padding-bottom: 10px; border: solid;"><br>
+
+      <label for="sessionCode" style="font-size: 1.5em; display: none; margin-bottom: 10px;" id="sessionCodeText">Session Code:</label><br>
+      <input type="text" id="sessionCode" name="sessionCode" style="width: 60%; margin-bottom: 2em; border-radius: 1.5em; font-size: 1.5em; display: none; padding-top: 10px; padding-bottom: 10px; border: solid;" onkeypress="return isNumberKey(event)"><br>
+      <button class="optionButton" id="startMultiplayer">Start</button>
+  </div>
+  </div>
+
+  <script>
+    let members
+
+    async function multiplayerStart() {
+      ws = new WebSocket("wss://api.rottingpears.com/")
+      let currentMode
+
+      ws.onmessage = function () {
+        getById("imgMode").style.display = "none"
+        getById("options").style.display = "none"
+        getById("multiplayerMenu").style.display = "block"
+
+        getById("username").value = localStorage.getItem("username") || ""
+        getById("password").value = localStorage.getItem("password") || ""
+        getById("sessionCode").value = ""
+
+        getById("new").addEventListener("click", function a() {
+          currentMode = "new"
+          getById("sessionCode").style.display = "none"
+          getById("sessionCodeText").style.display = "none"
+          getById("whatDoing").innerText = "Creating New Session"
+
+          getById("new").style.display = "none"
+          getById("join").style.display = "inline"
+        })
+
+        getById("join").addEventListener("click", function b() {
+          currentMode = "join"
+          getById("sessionCode").style.display = "inline"
+          getById("sessionCodeText").style.display = "inline"
+          getById("whatDoing").innerText = "Joining Session"
+
+          getById("join").style.display = "none"
+          getById("new").style.display = "inline"
+        })
+
+        getById("startMultiplayer").addEventListener("click", function b() {
+          let username = getById("username").value
+          let password = getById("password").value
+          let sessionCode = getById("sessionCode").value
+
+          if (username.length < 1 || password.length < 1) {
+            alert("Username And Password Must Not Be Blank")
+          }
+          else if (currentMode == "join") {
+            if (sessionCode.length < 5) {
+              alert("Session Code Must Be 5 Characters Long")
+            }
+            else {
+              joinSession(username, password, sessionCode)
+            }
+          }
+          else {
+            newSession(username, password)
+          }
+
+          localStorage.setItem("username", username)
+          localStorage.setItem("password", password)
+        })
+      }
+      
+      ws.onclose = function() {alert("Connection Has Been Disrupted"); window.location.reload()}
+    }
+
+    
+  </script>
+
+  <script src="../generatecard.js"></script>
+  <script src="../utility.js"></script>
+  <script src="../pearnet.js"></script>
+  <script src="multiplayer.js"></script>
+  <script src="hostlib.js"></script>
+  <script src="pleblib.js"></script>
+  <script src="../index.js"></script>
+  <script src="../rotextensions.js"></script>
+</body>
+</html>
