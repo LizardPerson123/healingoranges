@@ -15,19 +15,33 @@
   <style>li {font-size: 2em;} button {background-color: rgb(32, 196, 32);}</style>
 
   <script>
-    window.addEventListener("DOMContentLoaded", function() {
+    let currentSectionShowing = "one"
+
+    window.addEventListener("DOMContentLoaded", manageSwitch)
+
+    function manageSwitch() {
       const urlParams = new URLSearchParams(window.location.search)
       const origin = urlParams.get('origin')
 
       if (origin) {
-        getById("one").style.display = "none"
+        getById(currentSectionShowing).style.display = "none"
         getById(origin).style.display = "block"
+        currentSectionShowing = origin
       }
-    })
+      else {
+        getById(currentSectionShowing).style.display = "none"
+        getById("one").style.display = "block"
+        currentSectionShowing = "one"
+      }
+    }
 
-    window.addEventListener("popstate", function(event) {
-      window.location.reload()
-    })
+    window.addEventListener("popstate", manageSwitch)
+
+    function historyPush(origin) {
+      currentSectionShowing = origin
+
+      history.pushState("", "", "?origin=" + origin)
+    }
   </script>
 </head>
 <body>
@@ -53,11 +67,11 @@
     <p>The Website Has Singleplayer Games, But Also Has Multiplayer</p>
     <p style="color: gray;"><i>Version Beta 1.0.0</i></p>
     <p>Click On Any Of The Following To Learn More About It</p>
-    <button onclick="getById('one').style.display = 'none'; getById('two').style.display = 'block'; history.pushState({}, '', '?origin=two')">Games</button>
-    <button onclick="getById('one').style.display = 'none'; getById('three').style.display = 'block'; history.pushState({}, '', '?origin=three')">Accounts</button>
-    <button onclick="getById('one').style.display = 'none'; getById('five').style.display = 'block'; history.pushState({}, '', '?origin=five')">Rules</button>
-    <button onclick="getById('one').style.display = 'none'; getById('six').style.display = 'block'; history.pushState({}, '', '?origin=six')">Bans</button>
-    <button onclick="getById('one').style.display = 'none'; getById('four').style.display = 'block'; history.pushState({}, '', '?origin=four')">QnA</button>
+    <button onclick="getById('one').style.display = 'none'; getById('two').style.display = 'block'; historyPush('two')">Games</button>
+    <button onclick="getById('one').style.display = 'none'; getById('three').style.display = 'block'; historyPush('three')">Accounts</button>
+    <button onclick="getById('one').style.display = 'none'; getById('five').style.display = 'block'; historyPush('five')">Rules</button>
+    <button onclick="getById('one').style.display = 'none'; getById('six').style.display = 'block'; historyPush('six')">Bans</button>
+    <button onclick="getById('one').style.display = 'none'; getById('four').style.display = 'block'; historyPush('four')">QnA</button>
   </div>
 
   <div class="aboutSection" id="two" style="display: none;">

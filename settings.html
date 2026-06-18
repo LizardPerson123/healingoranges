@@ -20,6 +20,9 @@
     let currentUpperLimit
     let currentCategory
     let currentType
+    let currentSectionShowing = "one"
+    //Sections Not Put In The Browser's History, But Still Need To Be Unloaded
+    let additionalSectionsShowing = []
 
     async function createAccountApi(username, password) {
       let res = await fetch('https://api.rottingpears.com/createAccount', {method: 'POST', body: JSON.stringify({username: username, password: password}), headers: {"Content-Type": "application/json"}})
@@ -122,7 +125,7 @@
       let accounts = await getUsers(getById("search").value)
 
       accounts.forEach(function(account) {
-        getById("six").innerHTML += `<p onclick="getById(\'six\').style.display = \'none\'; getById(\'seven\').style.display = \'flex\'; seeAccounts('${account}'); history.pushState({}, '', '?origin=seven&a=${account}')">${account}</p>`
+        getById("six").innerHTML += `<p onclick="getById(\'six\').style.display = \'none\'; getById(\'seven\').style.display = \'flex\'; seeAccounts('${account}'); historyPush('seven', '${account}')">${account}</p>`
       })
 
       if (accounts.length < 1) {alert("Sorry, Can't Find Any Accounts"); window.location.reload()}
@@ -243,11 +246,42 @@
     }
     
     window.addEventListener("DOMContentLoaded", function() {
+      manageSwitch()
+    })
+
+    function historyPush(origin, username) {
+      currentSectionShowing = origin
+
+      if (username) {history.pushState("", "", "?origin=" + origin + "&a=" + username); return}
+
+      history.pushState("", "", "?origin=" + origin)
+    }
+
+    function manageUnloading() {
+      getById("achiList2").innerHTML = "<h2 class='achievementText'>Achievements</h2>"
+      getById("achiList3").innerHTML = "<h2 class='achievementText'>Achievements</h2>"
+      getById("achiList").innerHTML = ""
+
+      additionalSectionsShowing.forEach(function(section) {
+        getById(section).style.display = "none"
+
+        // Section Six Has Aditional Unloading Requirements
+        if (section == "six") {
+          getById(section).innerHTML = `<img src="favicon.ico" style="width: 8em; image-rendering: pixelated;">
+          <h1 style="margin-bottom: 0.7em;">Accounts Found</h1>`
+        }
+      })
+
+      additionalSectionsShowing = []
+    }
+
+    function manageSwitch() {
       const urlParams = new URLSearchParams(window.location.search)
       const origin = urlParams.get('origin')
+      manageUnloading()
 
       if (origin) {
-        getById("one").style.display = "none"
+        getById(currentSectionShowing).style.display = "none"
         getById(origin).style.display = "block"
 
         switch (origin) {
@@ -256,16 +290,13 @@
           case ("seven"): {getById("seven").style.display = "flex"; seeAccounts(); break}
           case ("eight"): {getAchievements(undefined, 0, 4, 'achiList')}
         }
+
+        currentSectionShowing = origin
       }
-    })
+      else {getById(currentSectionShowing).style.display = "none"; getById("one").style.display = "block"; currentSectionShowing = "one"}
+    }
 
-    window.addEventListener("popstate", function(event) {
-      const urlParams = new URLSearchParams(window.location.search)
-      name = urlParams.get('origin')
-
-      alert(name)
-      window.location.reload()
-    })
+    window.addEventListener("popstate", manageSwitch)
   </script>
 
 </head>
@@ -286,22 +317,22 @@
     <h1>Accounts</h1>
     <p id="currentAccount" style="margin-bottom: 15px;">Current Account: </p>
     <div style="display: flex; justify-content: center; gap: 5em; flex-wrap: wrap; margin-right: 8em; margin-top: 2em;">
-    <div style="background-color: white; width: 16em;" onclick="getById('one').style.display = 'none'; getById('two').style.display = 'block'; history.pushState({}, '', '?origin=two');" class="option">
+    <div style="background-color: white; width: 16em;" onclick="getById('one').style.display = 'none'; getById('two').style.display = 'block'; historyPush('two')" class="option">
       <img src="images/plus.svg" style="width: 8em; image-rendering: pixelated; margin-bottom: 2em; margin-top: 1em;">
       <p style="color: black;">New Account</p>
     </div>
 
-    <div style="background-color: white; width: 16em;" onclick="getById('one').style.display = 'none'; getById('three').style.display = 'block'; history.pushState({}, '', '?origin=three')" class="option">
+    <div style="background-color: white; width: 16em;" onclick="getById('one').style.display = 'none'; getById('three').style.display = 'block'; historyPush('three')" class="option">
       <img src="images/signin.svg" style="width: 8em; image-rendering: pixelated; margin-bottom: 2em; margin-top: 1em;">
       <p style="color: black;">Sign In</p>
     </div>
 
-    <div style="background-color: white; width: 16em;" onclick="getById('one').style.display = 'none'; getById('four').style.display = 'flex'; yourAccount(); history.pushState({}, '', '?origin=four')" class="option">
+    <div style="background-color: white; width: 16em;" onclick="getById('one').style.display = 'none'; getById('four').style.display = 'flex'; yourAccount(); historyPush('four')" class="option">
       <img src="images/settings.svg" style="width: 8em; image-rendering: pixelated; margin-bottom: 2em; margin-top: 1em;">
       <p style="color: black;">Your Account</p>
     </div>
 
-    <div style="background-color: white; width: 16em;" onclick="getById('one').style.display = 'none'; getById('five').style.display = 'block'; keyPressSearch(); history.pushState({}, '', '?origin=five')" class="option">
+    <div style="background-color: white; width: 16em;" onclick="getById('one').style.display = 'none'; getById('five').style.display = 'block'; keyPressSearch(); historyPush('five')" class="option">
       <img src="images/mglass.svg" style="width: 8em; image-rendering: pixelated; margin-bottom: 2em; margin-top: 1em;">
       <p style="color: black;">Find Accounts</p>
     </div>
@@ -365,7 +396,7 @@
       <p id="ban_undo" style="color: red; display: none;">Unban Date: Sun May 31 2026</p>
       <div style="padding-bottom: 2em;">
         <button id="signOut" onclick="signOut()" style="background-color: rgb(32, 196, 32);">Sign Out</button>
-        <button style="background-color: rgb(32, 196, 32);" onclick="getById('four').style.display = 'none'; getById('eight').style.display = 'block'; getAchievements(getById('name').innerText, 0, 10, 'achiList'); history.pushState({}, '', '?origin=eight&a=' + localStorage.getItem('username'));">View Achievements</button>
+        <button style="background-color: rgb(32, 196, 32);" onclick="getById('four').style.display = 'none'; getById('eight').style.display = 'block'; getAchievements(getById('name').innerText, 0, 10, 'achiList'); historyPush('eight', localStorage.getItem('username'));">View Achievements</button>
         <button id="aboutBans" onclick="window.location.href = 'about.html?origin=six'" style="background-color: red; display: none;">About Bans</button>
       </div>
     </div>
@@ -377,7 +408,7 @@
     <h1 style="margin-bottom: 0.7em;">Find Account</h1>
     <p>Search For An Account Below</p>
     <input type="text" id="search" name="search" style="width: 60%; border: solid; margin-bottom: 1em; border-radius: 1.5em; font-size: 1.5em; padding-top: 10px; padding-bottom: 10px;"><br>
-    <button style="padding-left: 20px; padding-right: 20px; background-color: rgb(23, 204, 23);" onclick="getById('five').style.display = 'none'; getById('six').style.display = 'block'; viewAccounts();">Search</button>
+    <button style="padding-left: 20px; padding-right: 20px; background-color: rgb(23, 204, 23);" onclick="getById('five').style.display = 'none'; getById('six').style.display = 'block'; viewAccounts(); additionalSectionsShowing.push('six')">Search</button>
   </div>
 
   <div id="six" style="display: none;">
@@ -400,7 +431,7 @@
       <p id="dateMade2" style="margin-bottom: 0px;">Created On: 6/1/26</p>
       <p id="xp2">XP: 6</p>
       <div style="padding-bottom: 2em;">
-        <button style="background-color: rgb(32, 196, 32);" onclick="getById('seven').style.display = 'none'; getById('eight').style.display = 'block'; getAchievements(getById('name2').innerText, 0, 10, 'achiList'); history.pushState({}, '', '?origin=eight&a=' + getById('name2').innerText);">View Achievements</button>
+        <button style="background-color: rgb(32, 196, 32);" onclick="getById('seven').style.display = 'none'; getById('eight').style.display = 'block'; getAchievements(getById('name2').innerText, 0, 10, 'achiList'); historyPush('eight', getById('name2').innerText)">View Achievements</button>
       </div>
     </div>
     </div>
