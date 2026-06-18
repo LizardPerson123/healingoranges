@@ -188,13 +188,13 @@
           case (2): {trophy = "gold"; break}
         }
 
-        let id = `achiDiv${generateRandomCode(10, 0, 9)}`
+        let idDiv = `achiDiv${generateRandomCode(10, 0, 9)}`
 
         let onClickEvents = []
         Array.from(getById("achiList").querySelectorAll("div")).forEach(function(item) {onClickEvents.push([item.id, item.onclick])})
         
         getById(id).innerHTML += `
-        <div class="achiDiv" id='${id}' style="display: flex; border: solid; border-color: #b5b5b5; padding-left: 5px; padding-right: 20px; gap: 5px; background: none; cursor: pointer">
+        <div class="achiDiv" id='${idDiv}' style="display: flex; border: solid; border-color: #b5b5b5; padding-left: 5px; padding-right: 20px; gap: 5px; background: none; cursor: pointer">
           <img src="images/${trophy}_trophy.png" id="achiImg" style="width: 5em; image-rendering: pixelated;">
           <div style="display: flex; align-items: center">
             <p style="font-size: 1.3em;">${achi.achievement_name}</p>
@@ -208,7 +208,7 @@
           catch {}
         })
 
-        getById(id).onclick = function() {alert(achi.desc)}
+        getById(idDiv).onclick = function() {alert(achi.desc)}
       })
 
       if (achi.length == 0) {getById(id).innerHTML += "<i style='color: gray; font-size: 1.5em; margin-bottom: 0.5em'>No Achievements Here<i>"}
