@@ -17,8 +17,6 @@ h1, h2 {
 h1 {font-size: 4em;}
 h2 {font-size: 2.5em;}
 
-#optionsAcc, .aboutSection {margin-right: 8em}
-
 p {
   font-size: 2em;
   margin-top: 0.2em;
@@ -81,6 +79,10 @@ body {
   .sidebarOp:hover {opacity: 0.8;}
 }
 
+@media only screen and (max-width: 1500px) {
+  #optionsAcc, .aboutSection, #menu {margin-right: 8em}
+}
+
 @media only screen and (max-width: 600px) {
   h1 {
     font-size: 3em;
@@ -99,7 +101,6 @@ body {
   #options {
     bottom: 10px;
   }
-  
 }
 
 @media screen and (max-width: 1300px) {
@@ -126,7 +127,7 @@ body {
     display: none;
   }
 
-  #menu, #optionsAcc, .aboutSection {margin-right: 0em;}
+  #menu, #optionsAcc, .aboutSection, .mainTextSec {margin-right: 0em;}
 
 }
 
