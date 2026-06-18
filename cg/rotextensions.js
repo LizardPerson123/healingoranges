@@ -81,7 +81,17 @@ let achi = new RottingExtension({
       }
     })
 
-    if (request.status != 200) {return "err"}
+    if (request.status != 200) {
+      achi = localStorage.getItem("achi")
+      if (achi == "" || !achi) {achi = {}}
+      else {achi = JSON.parse(achi)}
+      if (!achi[username]) {achi[username] = []}
+      achi[username].push(acheName)
+      achi = JSON.stringify(achi)
+      localStorage.setItem("achi", achi)
+      return "err"
+    }
+    
     request = await request.text()
     
     let code = generateRandomCode(10, 0, 9)
