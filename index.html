@@ -46,10 +46,10 @@
   <p id="subtext" style="color: darkgoldenrod;">It Exists!</p>
 
   <div id="menu" style="display: flex; justify-content: center; gap: 3em; flex-wrap: wrap;">
-    <div style="background-color: white; width: 16em;" class="option" onclick="window.location.href = 'eb'">
+    <div style="background-color: white; width: 16em;" class="option" onclick="event.stopPropagation(); window.location.href = 'eb'">
       <img src="images/ebola.png" style="width: 8em; image-rendering: pixelated;">
       <p style="color: black;">Ebola Words</p>
-      <button style="background-color: black; color: white;" onclick="window.location.href = 'eb/about?origin=rotpear'">Info</button>
+      <button style="background-color: black; color: white;" onclick="event.stopPropagation(); window.location.href = 'eb/about?origin=rotpear'">Info</button>
     </div>
 
     <div style="background-color: white; width: 16em;" class="option" onclick="window.location.href = 'cardgame.html'">
@@ -61,7 +61,7 @@
     <div style="background-color: white; width: 16em;" onclick="window.location.href = 'rr'" class="option">
       <img src="images/rotroulette.png" style="width: 8em; image-rendering: pixelated;">
       <p style="color: black;">Rotting Roulette</p>
-      <button style="background-color: black; color: white;" onclick="window.location.href = 'rr?origin=rotpear'">Info</button>
+      <button style="background-color: black; color: white;" onclick="event.stopPropagation(); window.location.href = 'rr?origin=rotpear'">Info</button>
     </div>
   </div>
   
@@ -82,8 +82,8 @@
     </div>
   </div>
 
-  <a id="about" style="position: fixed; color: gray;" href="about.html">About</a>
-  <p style="position: fixed; color: gray;" id="thisAccount">Current Account: None</p>
+  <a id="about" style="position: fixed; color: gray; height: max-content;" href="about.html">About</a>
+  <p style="position: fixed; color: gray; height: max-content;" id="thisAccount">Current Account: None</p>
   
   <script src="utility.js"></script>
   <script src="main.js"></script>
