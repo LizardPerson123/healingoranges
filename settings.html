@@ -109,7 +109,7 @@
       let upperLimit = 4
       let id = "achiList2"
 
-      getAchievements(username, lowerLimit, upperLimit, id)
+      getAchievements(username, lowerLimit, upperLimit, id, "all")
       if (user.is_banned) {
         getById("banned").style.display = "block"
         getById("ban_undo").style.display = "block"
@@ -144,7 +144,7 @@
       let lowerLimit = 0
       let upperLimit = 4
       let id = "achiList3"
-      getAchievements(user.name, lowerLimit, upperLimit, id)
+      getAchievements(user.name, lowerLimit, upperLimit, id, "all")
     }
 
     function keyPressSearch() {
@@ -262,7 +262,7 @@
     <img src="favicon.ico" style="width: 8em; image-rendering: pixelated;">
     <h1>Accounts</h1>
     <p id="currentAccount" style="margin-bottom: 15px;">Current Account: </p>
-    <div id='optionsAcc' style="display: flex; justify-content: center; gap: 5em; flex-wrap: wrap; margin-top: 2em;">
+    <div style="display: flex; justify-content: center; gap: 5em; flex-wrap: wrap; margin-right: 8em; margin-top: 2em;">
     <div style="background-color: white; width: 16em;" onclick="getById('one').style.display = 'none'; getById('two').style.display = 'block'; history.pushState({}, '', '?origin=two');" class="option">
       <img src="images/plus.svg" style="width: 8em; image-rendering: pixelated; margin-bottom: 2em; margin-top: 1em;">
       <p style="color: black;">New Account</p>
@@ -363,10 +363,10 @@
   </div>
 
   <div id="seven" style="display: none; flex-direction: column; align-items: center; gap:20px;">
-    <div class="padding" style="display: flex; flex-direction: column; align-items: center; gap: 20px;">
+    <div class="padding" style="width: max-content; display: flex; flex-direction: column; align-items: center; gap: 20px;">
     <img src="favicon.ico" style="width: 8em; image-rendering: pixelated;">
     <div class="padding" style="width: 100%; border: solid;">
-      <h1 class="username" id="name2">Account Name</h1>
+      <h1 id="name2" class="username">Account Name</h1>
       <h2 style="margin-top: -0.3em;" id="level2">Level: 1</h2>
     </div>
     <div class="padding" style="display: flex; flex-direction: column; align-items: center; border: solid; width: 100%; padding-bottom: 2em; gap:20px" id="achiList3">
