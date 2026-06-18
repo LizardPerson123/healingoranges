@@ -17,7 +17,7 @@ h1, h2 {
 h1 {font-size: 4em;}
 h2 {font-size: 2.5em;}
 
-#optionsAcc {margin-right: 8em}
+#optionsAcc, .aboutSection {margin-right: 8em}
 
 p {
   font-size: 2em;
@@ -126,7 +126,7 @@ body {
     display: none;
   }
 
-  #menu, #optionsAcc {margin-right: 0em;}
+  #menu, #optionsAcc, .aboutSection {margin-right: 0em;}
 
 }
 
