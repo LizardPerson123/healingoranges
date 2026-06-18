@@ -39,22 +39,22 @@
   <p style="color: darkgoldenrod;">Classic Card Games!</p>
 
   <div style="display: flex; justify-content: center; gap: 3em; flex-wrap: wrap;" id="menu">
-    <div style="background-color: white; width: 16em;" class="option">
+    <div style="background-color: white; width: 16em;" class="option" onclick="window.location.href = 'cg/blackjack'">
       <img src="images/blackjack.png" style="width: 8em; image-rendering: pixelated;">
       <p style="color: black;">Blackjack</p>
-      <button style="background-color: black; color: white;" onclick="window.location.href = 'cg/blackjack/howtoplay.html?origin=rotpear'">Info</button>
+      <button style="background-color: black; color: white;" onclick="event.stopPropagation(); window.location.href = 'cg/blackjack/howtoplay.html?origin=rotpear'">Info</button>
     </div>
 
-    <div style="background-color: white; width: 16em;" class="option">
+    <div style="background-color: white; width: 16em;" class="option" onclick="window.location.href = 'cg/war'">
       <img src="images/war.png" style="width: 8em; image-rendering: pixelated;">
       <p style="color: black;">War</p>
-      <button style="background-color: black; color: white;" onclick="window.location.href = 'cg/war/howtoplay.html?origin=rotpear'">Info</button>
+      <button style="background-color: black; color: white;" onclick="event.stopPropagation(); window.location.href = 'cg/war/howtoplay.html?origin=rotpear'">Info</button>
     </div>
 
-    <div style="background-color: white; width: 16em;" class="option">
+    <div style="background-color: white; width: 16em;" class="option" onclick="window.location.href = 'cg/slapjack'">
       <img src="images/slapjack.png" style="width: 8em; image-rendering: pixelated; background-color: black;">
       <p style="color: black;">Slapjack</p>
-      <button style="background-color: black; color: white;" onclick="window.location.href = 'cg/slapjack/howtoplay.html?origin=rotpear'">Info</button>
+      <button style="background-color: black; color: white;" onclick="event.stopPropagation(); window.location.href = 'cg/slapjack/howtoplay.html?origin=rotpear'">Info</button>
     </div>
   </div>
   
