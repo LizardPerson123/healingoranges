@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>War</title>
+  <link rel="stylesheet" href="war.css">
+  <link rel="stylesheet" href="../general.css">
+  <link rel="icon" type="image/icon-x" href="favicon.ico">
+
+  <style id="styleTag"></style>
+
+  <script>
+    console.log("Version 2.00")
+
+    let playerCards
+    let cpuCards
+    let i = 0
+    let playerWarCards = []
+    let cpuWarCards = []
+    let biasNum
+    let lastResult = "none"
+    let streak = 0
+
+    function showCard(card, id) {
+      getById(id).innerHTML += `<img width="100%" src='../cards/${card[0]}-${card[1]}.svg' >`
+    }
+
+    function hideCard(id) {
+      getById(id).innerHTML = ""
+    }
+
+    function preLoadCard(card) {
+      if (!card) {return}
+      let img = new Image()
+      img.src = `../cards/${card[0]}-${card[1]}.svg`
+    }
+
+    function startGame(firstCardSet, secondCardSet, cardNum) {
+      firstCardSet = []
+      secondCardSet = []
+      let cards = []
+
+      for (let i = 1; i <= cardNum; i++) {
+        cards.push(generateCard())
+      }
+
+      return bias(cards, getRndInteger(0, 11) / 10)
+    }
+
+    function nextInDeck(cardDeck) {
+      cardDeck.push(cardDeck[0])
+      removeItem(cardDeck, cardDeck[0])
+
+      return cardDeck
+    }
+
+    function firstRound() {
+      achi.register("Play War", "bronze")
+      getById("round").style.display = "inline"
+      getById("options").style.display = "none"
+      getById("cards").style.display = "flex"
+      getById("round").innerHTML = "Place Card"
+      getById("round").setAttribute("onclick", "round()")
+      getById("playerCardsNum").style.display = "block"
+      getById("cpuCardsNum").style.display = "block"
+      getById("whoWon").style.display = "block"
+
+      round()
+    }
+
+    function round() {
+      if (!cpuCards[0]) {
+        alert("You Win!")
+        achi.laterRegi("Win The Game (War)", "silver")
+
+        let gameWinCount = Number(localStorage.getItem("gameWinCount")) || 0
+        gameWinCount++
+        if (gameWinCount == 3) {
+          localStorage.setItem("gameWinCount", 0)
+          achi.laterRegi("Win War 3 Times In A Row", "gold")
+        }
+        else {localStorage.setItem("gameWinCount", gameWinCount)}
+
+        handleEnd(true)
+      }
+      else if (!playerCards[0]) {
+        alert("CPU Wins")
+        localStorage.setItem("gameWinCount", 0)
+        achi.laterRegi("Lose A Game Of War", "bronze")
+        handleEnd(false)
+      }
+
+      hideCard("playerCards")
+      hideCard("cpuCards")
+
+      showCard(cpuCards[0], "cpuCards")
+      preLoadCard(cpuCards[1])
+      showCard(playerCards[0], "playerCards")
+      preLoadCard(playerCards[1])
+
+      let compareResult = compare(playerCards[0][1], cpuCards[0][1])
+      
+      if (compareResult == "war") {
+        getById("whoWon").innerHTML = "War!"
+
+        getById("outerPlayerCards").style.width = "100%"
+        getById("outerCPUCards").style.width = "100%"
+
+        if (!(cpuCards.length < 2)) {
+          cpuWarCards.push(cpuCards[0])
+          removeItem(cpuCards, cpuCards[0])
+        }
+
+        if (!(playerCards.length < 2)) {
+          playerWarCards.push(playerCards[0])
+          removeItem(playerCards, playerCards[0])
+        }
+
+        for (let i = 1; i <= 3; i++) {
+          if (!(playerCards.length < 2)) {
+            let playerCard = nextInDeck(playerCards)[0]
+          
+            removeItem(playerCards, playerCard)
+            playerWarCards.push(playerCard)
+
+            showCard(playerCard, "playerCards")
+          }
+          else {
+            
+          }
+          
+        }
+
+        for (let i = 1; i <= 3; i++) {
+          if (!(cpuCards.length < 2)) {
+            let cpuCard = nextInDeck(cpuCards)[0]
+
+            removeItem(cpuCards, cpuCard)
+            cpuWarCards.push(cpuCard)
+
+            showCard(cpuCard, "cpuCards")
+          }
+          else {
+            break
+          }
+         
+        }
+
+        getById("round").setAttribute("onclick", "warRound()")
+
+      }
+
+      else if (compareResult) {
+        getById("whoWon").innerHTML = "Player Wins Card"
+
+        if (lastResult == "player") {
+          streak++
+          getById("whoWon").innerHTML += " x" + streak
+
+          switch (streak) {
+            case (3): {achi.register("Reach A Streak Of 3", "bronze"); break}
+            case (5): {achi.register("Reach A Streak Of 5", "silver"); break}
+            case (8): {achi.register("Reach A Streak Of 8", "gold"); break}
+          }
+        }
+        else {streak = 1}
+        lastResult = "player"
+
+        playerCards.push(cpuCards[0])
+        removeItem(cpuCards, cpuCards[0])
+
+        playerCards = nextInDeck(playerCards)
+      }
+
+      else {
+        getById("whoWon").innerHTML = "CPU Wins Card"
+
+        if (lastResult == "dealer") {
+          streak++
+          getById("whoWon").innerHTML += " x" + streak
+        }
+        else {streak = 1}
+        lastResult = "dealer"
+
+        cpuCards.push(playerCards[0])
+        removeItem(playerCards, playerCards[0])
+
+        cpuCards = nextInDeck(cpuCards)
+      }
+
+      getById("playerCardsNum").innerHTML = `Player Cards: ${playerCards.length}`
+      getById("cpuCardsNum").innerHTML = `CPU Cards: ${cpuCards.length}`
+
+      i++
+    }
+
+    function warRound() {
+      let playerCard = nextInDeck(playerCards)[0]
+      removeItem(playerCards, playerCard)
+      playerWarCards.push(playerCard)
+
+      let cpuCard = nextInDeck(cpuCards)[0]
+      removeItem(cpuCards, cpuCard)
+      cpuWarCards.push(cpuCard)
+
+      let compareResult = compare(playerCard[1], cpuCard[1])
+
+      if (compareResult == "war") {
+        alert("Tie! The War Continues")
+        achi.register("Tie In A War", "silver")
+        showCard(playerCard, "playerCards")
+        showCard(cpuCard, "cpuCards")
+        return
+      }
+      else if (compareResult) {
+        getById("whoWon").innerHTML = "Player Won The War"
+        playerWarCards.forEach(function(card) {
+          playerCards.push(card)
+        })
+
+        cpuWarCards.forEach(function(card) {
+          playerCards.push(card)
+        })
+        
+        achi.register("Win A War", "bronze")
+      }
+      else {
+        getById("whoWon").innerHTML = "CPU Won The War"
+        playerWarCards.forEach(function(card) {
+          cpuCards.push(card)
+        })
+
+        cpuWarCards.forEach(function(card) {
+          cpuCards.push(card)
+        })
+      }
+
+      playerWarCards = []
+      cpuWarCards = []
+
+      getById("round").setAttribute("onclick", "round()")
+
+      getById("playerCardsNum").innerHTML = `Player Cards: ${playerCards.length}`
+      getById("cpuCardsNum").innerHTML = `CPU Cards: ${cpuCards.length}`
+
+      hideCard("cpuCards")
+      hideCard("playerCards")
+
+      getById("outerPlayerCards").style.width = "40%"
+      getById("outerCPUCards").style.width = "40%"
+
+      streak = 0
+      lastResult = "none"
+    }
+
+    function compare(playerCard, cpuCard) {
+      if (playerCard == 1) {
+        playerCard = 14
+      }
+
+      if (cpuCard == 1) {
+        cpuCard = 14
+      }
+
+      if (playerCard == cpuCard) {
+        return "war"
+      }
+      else if (playerCard > cpuCard) {
+        return true
+      }
+      
+      return false
+    }
+    
+    //Based Off Python Implementation Of Bubble Sort By w3Schools And JavaScript Implementation By GeeksForGeeks
+    function bubbleSortCards(cards) {
+      for (let i = 0; i < cards.length - 1; i++) {
+        for (let j = 0; j < cards.length - i - 1; j++) {
+          if (cards[j][1] > cards[j + 1][1]) {
+            let temp = cards[j]
+            cards[j] = cards[j + 1]
+            cards[j + 1] = temp
+          }
+        }
+      } 
+
+      return cards
+    }
+
+    function bias(cards, bias) {
+      biasNum = bias
+
+      cards = bubbleSortCards(cards)
+
+      let firstCardSet = []
+      let secondCardSet = []
+
+      let higherCards = cards.slice(cards.length / 2)
+      let lowerCards = cards.slice(0, cards.length / 2)
+
+      let numberInHigher = Math.round(bias * cards.length / 2)
+      let numberInLower = cards.length / 2 - numberInHigher
+
+      shuffle(higherCards)
+      shuffle(lowerCards)
+
+      let giveToSecondCardSet = higherCards.slice(0, numberInHigher)
+      higherCards = higherCards.slice(numberInHigher)
+      secondCardSet = giveToSecondCardSet
+      
+      giveToSecondCardSet = lowerCards.slice(0, numberInLower)
+      lowerCards = lowerCards.slice(numberInLower)
+      secondCardSet = secondCardSet.concat(giveToSecondCardSet)
+
+      firstCardSet = higherCards.concat(lowerCards)
+
+      return [firstCardSet, secondCardSet]
+    }
+
+    async function handleEnd(won) {
+      let t = 0
+      if (won) {t=1}
+
+      if (localStorage.getItem("username")) {
+        document.querySelector("body").innerText = "Please Wait..."
+              
+        try {
+          await fetch("https://api.rottingpears.com/xp", {
+            method: "POST",
+            body: JSON.stringify({
+              n: localStorage.getItem("username"),
+              p: localStorage.getItem("password"),
+              t: t
+            }),
+            headers: {
+              "Content-type": "application/json; charset=UTF-8"
+            }
+          })
+        }
+        catch {}
+      }
+
+      window.location.reload()
+    }
+
+  </script>
+</head>
+<body>
+  <div id="chat" style="display: none;">
+   <h1 style="font-size: 3em; margin-top: 20px;">Chat</h1>
+   <button onclick="RottingExtension.setCurrentView('main')" class="optionButton" style="margin-bottom: 20px;">Go Back</button>
+   <div id="chatShow"></div>
+
+   <div style="display: flex; flex-direction: column; align-items: center; margin-bottom: 30px;">
+     <input style="border: solid; width: 80%; font-size: 2em; border-radius: 1em;" id="textMsgInput">
+   </div>
+
+   <button onclick="chat.register(thisPlayer, getById('textMsgInput').value); broadcast(JSON.stringify({msg: 'message', chat: getById('textMsgInput').value})); getById('textMsgInput').value = ''" class="optionButton">Send Message</button>
+
+   <script>
+    function keyPressSendMessage() {
+     document.addEventListener('keydown', onKeyHandler)
+     function onKeyHandler(e) {
+       if (e.keyCode === 13) {
+        chat.register(thisPlayer, getById('textMsgInput').value)
+        broadcast(JSON.stringify({msg: 'message', chat: getById('textMsgInput').value}))
+        getById("textMsgInput").value = ""
+       }
+     }
+    }
+
+    keyPressSendMessage()
+   </script>
+  </div>
+
+  <div id="achiLists" style="position: absolute; top: 20px; right: 0px; display: flex; flex-direction: column; gap: 20px">
+
+  </div>
+
+  <div id="main">
+  <img src="favicon.ico" style="width: 7em; image-rendering: pixelated;">
+  <h1 id="iHaveACrushOn" style="margin-top: 0em; margin-bottom: 10px;">War</h1>
+  <img id="imgMode" src="../sun.svg" style="position: absolute; right: 10px; top: 0px; width: 100px;" onclick="changeMode();">
+  <div style="object-fit: cover; display: flex; justify-content: center; align-items: center; gap: 10px; flex-wrap: wrap;" id="options">
+    <div style="position: relative; text-align: center;">
+      <img style="image-rendering: pixelated;" onclick="firstRound()" class="gameOptionCards" src="../playingcardback.png">
+      <h3 style="font-size: 2.5em; color: black; " class="centerText">Singleplayer</h3>
+    </div>
+
+    <div style="position: relative; text-align: center;">
+      <img style="image-rendering: pixelated;" onclick="multiplayerStart()" class="gameOptionCards" src="../playingcardback.png">
+      <h3 style="font-size: 2.5em; color: black; " class="centerText" >Multiplayer</h3>
+    </div>
+
+    <div style="position: relative; text-align: center;">
+      <img style="image-rendering: pixelated;" onclick="window.location.href = 'howtoplay.html'" class="gameOptionCards" src="../playingcardback.png">
+      <h3 style="font-size: 2.5em; color: black; " class="centerText" >How To Play</h3>
+    </div>
+  </div>
+
+  <button style="display: none;" id="round" onclick="firstRound()" class="optionButton">Start</button>
+  <button id="chatButton" style="display: none;" class="optionButton" onclick="chat.show()">Chat</button>
+  
+  <h1 id="host" style="display: none;"></h1>
+  <h1 id="whoWon" style="display: none;">Click Start Or Multiplayer</h1>
+  <p id="cpuCardsNum" class="infoText" style="display: none;">CPU Cards: </p>
+  <p id="playerCardsNum" class="infoText" style="display: none;">Your Cards: </p>
+
+  <div id="cards" style="display: none; justify-content: center; flex-wrap: wrap;">
+    <div id="outerPlayerCards" style="margin-top: 0.5em; width: 40%;" class="outerBoxDiv">
+      <h1 id="playerName">Your Cards</h1>
+      <div id="playerCards" class="cardDeck">
+      </div>
+    </div>
+
+    <div id="outerCPUCards" class="outerBoxDiv" style="width: 40%; margin-top: 0.5em; margin-left: 1em;">
+      <h1 id="opponentName">CPU Cards</h1>
+      <div id="cpuCards" class="cardDeck">
+      </div>
+    </div>
+  </div>
+
+  <div style="display: none;" id="multiplayerNewMenu">
+    <h2 id="status"></h2>
+  </div>
+
+  <div style="display: none;" id="multiplayerMenu">
+      <h2 style="margin-bottom: 0.7em; margin-top: 5px;" id="whatDoing">Creating New Session</h2>
+      <div style="margin-bottom: 2em;">
+        <input type="button" id="new" name="joinOrNew" value="New Session" class="optionButton" style="display: none;">
+        <input type="button" id="join" name="joinOrNew" value="Join Session" class="optionButton"><br>
+      </div>
+      <label for="username" style="font-size: 1.5em; margin-bottom: 10px;">Username:</label><br>
+      <input type="text" id="username" name="username" style="width: 60%; margin-bottom: 2em; border-radius: 1.5em; font-size: 1.5em; padding-top: 10px; padding-bottom: 10px; border: solid;"><br>
+      <label for="password" style="font-size: 1.5em; margin-bottom: 10px;">Password:</label><br>
+      <input type="text" id="password" name="password" style="width: 60%; margin-bottom: 2em; border-radius: 1.5em; font-size: 1.5em; padding-top: 10px; padding-bottom: 10px; border: solid;"><br>
+
+      <label for="sessionCode" style="font-size: 1.5em; display: none; margin-bottom: 10px;" id="sessionCodeText">Session Code:</label><br>
+      <input type="text" id="sessionCode" name="sessionCode" style="width: 60%; margin-bottom: 2em; border-radius: 1.5em; font-size: 1.5em; display: none; padding-top: 10px; padding-bottom: 10px; border: solid;" onkeypress="return isNumberKey(event)"><br>
+      <button class="optionButton" id="startMultiplayer">Start</button>
+  </div>
+  </div>
+
+  <script src="../pearnet.js"></script>
+  <script src="pleblib.js"></script>
+  <script src="hostlib.js"></script>
+  <script src="multiplayer.js"></script>
+  <script src="../utility.js"></script>
+  <script src="../generatecard.js"></script>
+  <script src="../index.js"></script>
+  <script src="../rotextensions.js"></script>
+  <script>
+    let start = startGame(playerCards, cpuCards, 26)
+    playerCards = start[0]
+    cpuCards = start[1]
+  </script>
+
+  <script>
+    let currentMode
+
+    async function multiplayerStart() {
+      ws = new WebSocket("wss://api.rottingpears.com/")
+
+      ws.onmessage = function () {
+        getById("options").style.display = "none"
+        getById("round").style.display = "none"
+        getById("cards").style.display = "none"
+        getById("whoWon").style.display = "none"
+        getById("imgMode").style.display = "none"
+        getById("round").innerHTML = "Place Card"
+
+        getById("multiplayerMenu").style.display = "block"
+
+        getById("username").value = localStorage.getItem("username") || ""
+        getById("password").value = localStorage.getItem("password") || ""
+        getById("sessionCode").value = ""
+
+        getById("new").addEventListener("click", function a() {
+          currentMode = "new"
+          getById("sessionCode").style.display = "none"
+          getById("sessionCodeText").style.display = "none"
+          getById("whatDoing").innerText = "Creating New Session"
+
+          getById("new").style.display = "none"
+          getById("join").style.display = "inline"
+        })
+
+        getById("join").addEventListener("click", function b() {
+          currentMode = "join"
+          getById("sessionCode").style.display = "inline"
+          getById("sessionCodeText").style.display = "inline"
+          getById("whatDoing").innerText = "Joining Session"
+
+          getById("join").style.display = "none"
+          getById("new").style.display = "inline"
+        })
+
+        getById("startMultiplayer").addEventListener("click", function b() {
+          let username = getById("username").value
+          let password = getById("password").value
+          let sessionCode = getById("sessionCode").value
+
+          if (username.length < 1 || password.length < 1) {
+            alert("Username And Password Must Not Be Blank")
+          }
+          else if (currentMode == "join") {
+            if (sessionCode.length < 5) {
+              alert("Session Code Must Be 5 Characters Long")
+            }
+            else {
+              joinSession(username, password, sessionCode)
+            }
+          }
+          else {
+            newSession(username, password)
+          }
+
+          localStorage.setItem("username", username)
+          localStorage.setItem("password", password)
+        })
+      }
+      
+      ws.onclose = function() {alert("Connection Has Been Disrupted"); window.location.reload()}
+    }
+
+
+  </script>
+</body>
+</html>
