@@ -35,7 +35,6 @@
       let achi = await fetch("https://api.rottingpears.com/achiAll?l=" + lowerLimit + "&ul=" + upperLimit + "&c=" + category + "&t=" + type)
       achi = await achi.json()
       achi.forEach(function(achi) {
-        console.log(achi)
         let trophy = "bronze"
         switch (achi[1].trophyLevel) {
           case (1): {trophy = "silver"; break}
@@ -125,7 +124,7 @@
   <button style="box-shadow: none; background-color: rgb(32, 196, 32);" onclick="goForwardAchi()">View More</button>
 
   <div id="sidebar" style="position: fixed; height: 100vh; right: 0px; top: 0px; padding-left: 1em; padding-right: 1em;">
-    <div style="display: flex; flex-direction: column; justify-content: center; text-align: center; align-items: center; cursor: pointer;" onclick="window.location.href = 'index.html';" class="sidebarOp">
+    <div style="display: flex; flex-direction: column; justify-content: center; text-align: center; align-items: center; cursor: pointer; margin-top: 20px;" onclick="window.location.href = 'index.html';" class="sidebarOp">
       <img src="images/house.svg" style="width: 100%; image-rendering: pixelated;">
       <p style="font-size: 200%;">Home</p>
     </div>

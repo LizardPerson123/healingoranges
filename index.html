@@ -24,8 +24,6 @@
         getById("what").onclick = () => {window.location.href = 'about.html'}
         localStorage.setItem("beenHere", Number(localStorage.getItem("beenHere") || 0) + 1)
       } 
-
-      alert("To Quote Nolan: KYS")
     })
   </script>
 
@@ -48,7 +46,7 @@
   <p id="subtext" style="color: darkgoldenrod;">It Exists!</p>
 
   <div id="menu" style="display: flex; justify-content: center; gap: 3em; flex-wrap: wrap;">
-    <div style="background-color: white; width: 16em;" class="option" onclick="window.location.href = 'eb'">
+    <div style="background-color: white; width: 16em;" class="option" onclick="event.stopPropagation(); window.location.href = 'eb'">
       <img src="images/ebola.png" style="width: 8em; image-rendering: pixelated;">
       <p style="color: black;">Ebola Words</p>
       <button style="background-color: black; color: white;" onclick="event.stopPropagation(); window.location.href = 'eb/about?origin=rotpear'">Info</button>
@@ -68,7 +66,7 @@
   </div>
   
   <div id="sidebar" style="position: fixed; height: 100vh; right: 0px; top: 0px; padding-left: 1em; padding-right: 1em;">
-    <div style="display: flex; flex-direction: column; justify-content: center; text-align: center; align-items: center; cursor: pointer;" onclick="window.location.href = 'index.html';" class="sidebarOp">
+    <div style="display: flex; flex-direction: column; justify-content: center; text-align: center; align-items: center; cursor: pointer; margin-top: 20px;" onclick="window.location.href = 'index.html';" class="sidebarOp">
       <img src="images/house.svg" style="width: 100%; image-rendering: pixelated;">
       <p style="font-size: 200%;">Home</p>
     </div>
