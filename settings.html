@@ -99,8 +99,11 @@
       let username = localStorage.getItem("username")
       if (!username || username == "") {alert("Not Logged In"); window.location.reload()}
 
-      let user = await getDataApi(username)
-      try {user.name.a}
+      let user
+      try {
+        user = await getDataApi(username)
+        user.name.a
+      }
       catch (err) {alert("Error Occured"); window.location.reload()}
 
       getById("name").innerText = user.name
@@ -327,7 +330,7 @@
       <p style="color: black;">Sign In</p>
     </div>
 
-    <div style="background-color: white; width: 16em;" onclick="getById('one').style.display = 'none'; getById('four').style.display = 'flex'; yourAccount(); historyPush('four')" class="option">
+    <div style="background-color: white; width: 16em;" onclick="yourAccount(); getById('one').style.display = 'none'; getById('four').style.display = 'flex'; historyPush('four')" class="option">
       <img src="images/settings.svg" style="width: 8em; image-rendering: pixelated; margin-bottom: 2em; margin-top: 1em;">
       <p style="color: black;">Your Account</p>
     </div>
