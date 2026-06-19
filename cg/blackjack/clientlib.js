@@ -32,9 +32,9 @@ function getBetNum(event) {
         getById("chatButton").style.display = "inline-block"
 
         let eventData = JSON.parse(event.data)
-        eventData = JSON.parse(eventData.content)
 
         if (eventData.from == host) {
+          eventData = JSON.parse(eventData.content)
           if (eventData.msg == "getCard") {
             await waitForCardsBeingShown()
 
