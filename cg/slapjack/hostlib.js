@@ -88,7 +88,7 @@ async function gameHost() {
           getById(`${value.username}Num`).innerText = `${value.username} Cards: ${value.cards.length}`
         }
 
-        await broadcast(JSON.stringify({msg: "slap", usersData: usersData, slapper: slap}))
+        broadcast(JSON.stringify({msg: "slap", usersData: usersData, slapper: slap}))
 
         alert(`${slap} Slapped`)
 

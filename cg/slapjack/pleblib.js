@@ -75,7 +75,6 @@ function waitForSlapPLeb() {
       getById("cardImg").removeEventListener("click", clickEvent)
 
       onMessageFrom = gamePleb
-      
     })
 
     onMessageFrom = function(event, from) {
