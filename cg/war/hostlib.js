@@ -1,272 +1,239 @@
-let inWar = false
+let clickEventFunc
 let inPreviousManagement = false
 
-function multiRoundHost() {
+async function gameHost() {
+  achi.register("Play Slapjack Multiplayer", "bronze")
+  getById("round").style.display = "inline-block"
   getById("chatButton").style.display = "inline-block"
+  getById("round").removeAttribute("onclick")
+  getById("multiplayerNewMenu").style.display = "none"
+  getById("currentTurn").style.display = "block"
+
+  for (const [key, value] of Object.entries(usersData)) {
+    getById("cardNum").innerHTML += `
+      <p id="${value.username}Num" class="infoText">${value.username} Cards: ${Math.round(52 / users.length)}</p>
+    `
+  }
   
-  if (host.placedDownCard && pleb.placedDownCard) {
-    if (inPreviousManagement) {return}
-    inPreviousManagement = true
+  while (true) {
+    let preLoadCardsArray = []
 
-    let wonGame
+    for (const [key, value] of Object.entries(usersData)) {
+      preLoadCard(value.cards[0])
+      preLoadCardsArray.push(value.cards[0])
+    }
 
-    if (!pleb.cards[0]) {
-      broadcast(JSON.stringify({whoWon: 'playerGame'}))
-      alert("You Win!")
+    await broadcast(JSON.stringify({msg: "preLoadCards", cards: preLoadCardsArray}))
 
-      let doContinue = confirm("Play Again?")
-      if (doContinue) {
-        resetGameHost()
-        inPreviousManagement = false
-        return
+    for (const [key, value] of Object.entries(usersData)) {
+      if (!usersData[key]) {
+        continue
       }
+
+      let checkCards = checkIfPlayerHasAllCards()
+
+      if (checkCards) {
+        broadcast(JSON.stringify({msg: "endGame", winner: checkCards}))
+        alert(`${checkCards} Wins`)
+        await resetGame()
+      }
+
+      let card
+      if (key == host) {
+        onMessageFrom = async function(event, from) {
+          checkIfChatMsg(event, from)
+        }
+
+        getById("currentTurn").innerText = "Your Turn"
+
+        await broadcast(JSON.stringify({msg: "getCard", player: key}))
+
+        await waitForPlayerInputHost(key)
+
+        card = await placeCardMulti(value.cards)
+
+        await broadcast(JSON.stringify({msg: "displayCard", card: card, usersData: usersData}))
+
+        inPreviousManagement = false
+      }
+
       else {
+        getById("currentTurn").innerText = `${key}'s Turn`
+        await broadcast(JSON.stringify({msg: "getCard", player: key}))
+        let input = await waitForInput(key)
+
+        if (!input) {
+          continue
+        }
+        
+        card = await placeCardMulti(value.cards)
+
+        await broadcast(JSON.stringify({msg: "displayCard", card: card, usersData: usersData}))
+
+        inPreviousManagement = false
+      }
+
+      for (const [key, value] of Object.entries(usersData)) {
+        getById(`${value.username}Num`).innerText = `${value.username} Cards: ${value.cards.length}`
+      }
+
+      //Card Is Jack
+      if (card[1] == 11) {
+        let slap = await waitForSlap()
+        
+        deckCards.forEach(function(item) {
+          usersData[slap].cards.push(item)
+        })
+
+        for (const [key, value] of Object.entries(usersData)) {
+          getById(`${value.username}Num`).innerText = `${value.username} Cards: ${value.cards.length}`
+        }
+
+        broadcast(JSON.stringify({msg: "slap", usersData: usersData, slapper: slap}))
+
+        alert(`${slap} Slapped`)
+
+        getById("currentTurn").innerHTML = "Waiting For Other Players..."
+
+        deckCards = []
+      }
+    }
+  }
+}
+
+function waitForInput(username) {
+  return new Promise(function(resolve) {
+    onMessageFrom = function(event, from) {
+      if (inPreviousManagement) {return}
+      let eventData = JSON.parse(event.data)
+
+      if (checkIfChatMsg(event, from)) {return}
+
+      if (eventData.from == username) {
+        onMessageFrom = function() {checkIfChatMsg(event, from)}
+        resolve(true)
+      }
+    }
+
+    onUserLeft = async function(event) {
+      onUserLeave(event)
+
+      let eventData = JSON.parse(event.data)
+
+      if (eventData.username == username) {
+        resolve(null)
+      }
+
+      onUserLeft = onUserLeave
+
+      let users = await getMembersApi()
+
+      if (users.length < 2) {
+        alert("Not Enough Users To Continue, Ending Session")
         window.location.reload()
       }
     }
-    else if (!host.cards[0]) {
-      broadcast(JSON.stringify({whoWon: 'opponentGame'}))
-      alert(`${pleb.username} Wins!`)
 
-      let doContinue = confirm("Play Again?")
-      if (doContinue) {
-        resetGameHost()
-        inPreviousManagement = false
-        return
-      }
-      else {
-        window.location.reload()
-      }
+    if (usersData[username].cards.length == 0) {
+      resolve(null)
     }
-
-    hideCard("playerCards")
-    hideCard("cpuCards")
-
-    showCard(pleb.cards[0], "cpuCards")
-    preLoadCard(pleb.cards[1])
-
-    showCard(host.cards[0], "playerCards")
-    preLoadCard(host.cards[1])
-
-    let plebCard = pleb.cards[0]
-    let hostCard = host.cards[0]
-
-    let compareResult = compare(hostCard[1], plebCard[1])
-
-    if (compareResult == "war") {
-      inWar = true
-      getById("whoWon").innerHTML = "War!"
-
-      getById("outerPlayerCards").style.width = "100%"
-      getById("outerCPUCards").style.width = "100%"
-
-      pleb.warCards.push(pleb.cards[0])
-      host.warCards.push(host.cards[0])
-
-      removeItem(host.cards, host.cards[0])
-      removeItem(pleb.cards, pleb.cards[0])
-
-      for (let i = 1; i <= 3; i++) {
-        if (!(host.cards.length < 2)) {
-          let hostCard = nextInDeck(host.cards)[0]
-
-          removeItem(host.cards, hostCard)
-          host.warCards.push(hostCard)
-
-          showCard(hostCard, "playerCards")
-        }
-        
-      }
-
-      for (let i = 1; i <= 3; i++) {
-        if (!(pleb.cards.length < 2)) {
-          let plebCard = nextInDeck(pleb.cards)[0]
-
-          removeItem(pleb.cards, plebCard)
-          pleb.warCards.push(plebCard)
-
-          showCard(plebCard, "cpuCards")
-        }
-        else {
-          break
-        }
-        
-      }
-    }
-
-    else if (compareResult) {
-      getById("whoWon").innerHTML = `You Win ${pleb.username}'s Card`
-
-      wonGame = false
-
-      if (lastResult == "player") {
-        streak++
-        getById("whoWon").innerHTML += " x" + streak
-      }
-      else {streak = 1}
-      lastResult = "player"
-
-      host.cards.push(pleb.cards[0])
-      removeItem(pleb.cards, pleb.cards[0])
-
-      host.cards = nextInDeck(host.cards)
-    }
-
-    else {
-      getById("whoWon").innerHTML = `${pleb.username} Wins Your Card`
-
-      wonGame = true
-
-      if (lastResult == "other") {
-        streak++
-        getById("whoWon").innerHTML += " x" + streak
-      }
-      else {streak = 1}
-      lastResult = "other"
-
-      pleb.cards.push(host.cards[0])
-      removeItem(host.cards, host.cards[0])
-
-      pleb.cards = nextInDeck(pleb.cards)
-    }
-
-    getById("playerCardsNum").innerHTML = `Player Cards: ${host.cards.length}`
-    getById("cpuCardsNum").innerHTML = `CPU Cards: ${pleb.cards.length}`
-
-    if (inWar) {
-      broadcast(JSON.stringify({whoWon: 'war', hostCard: host.warCards, plebCard: pleb.warCards, hostCardLength: host.cards.length, plebCardLength: pleb.cards.length}))
-    }
-    else {
-      broadcast(JSON.stringify({whoWon: wonGame, hostCard: hostCard, plebCard: plebCard, hostCardLength: host.cards.length, plebCardLength: pleb.cards.length, nextHostCard: host.cards[1], nextPlebCard: pleb.cards[1]}))
-    }
-
-    host.placedDownCard = false
-    pleb.placedDownCard = false 
-
-    inPreviousManagement = false
-  }
+  })
 }
 
-async function multiWarRoundHost() {
-  if (host.placedDownCard && pleb.placedDownCard) {
-    if (inPreviousManagement) {return}
-    inPreviousManagement = true
-    
-    let hostCard = nextInDeck(host.cards)[0]
-    removeItem(host.cards, hostCard)
-    host.warCards.push(hostCard)
-
-    let plebCard = nextInDeck(pleb.cards)[0]
-    removeItem(pleb.cards, plebCard)
-    pleb.warCards.push(plebCard)
-
-    let compareResult = compare(hostCard[1], plebCard[1])
-
-    if (compareResult == "war") {
-      alert("Tie! The War Continues")
-      showCard(hostCard, "playerCards")
-      showCard(plebCard, "cpuCards")
-
-      await broadcast(JSON.stringify({whoWon: "tie", hostCardLength: host.cards.length, plebCardLength: pleb.cards.length}))
-
-      inPreviousManagement = false
-      return
-    }
-    else if (compareResult) {
-      getById("whoWon").innerHTML = `${host.username} Wins The War`
-      host.warCards.forEach(function(card) {
-        host.cards.push(card)
-      })
-
-      pleb.warCards.forEach(function(card) {
-        host.cards.push(card)
-      })
-
-      await broadcast(JSON.stringify({whoWon: false, hostCardLength: host.cards.length, plebCardLength: pleb.cards.length}))
-    }
-    else {
-      getById("whoWon").innerHTML = `${pleb.username} Wins The War`
-      host.warCards.forEach(function(card) {
-        pleb.cards.push(card)
-      })
-
-      pleb.warCards.forEach(function(card) {
-        pleb.cards.push(card)
-      })
-
-      await broadcast(JSON.stringify({whoWon: true, hostCardLength: host.cards.length, plebCardLength: pleb.cards.length}))
+function waitForPlayerInputHost() {
+  return new Promise(function(resolve) {
+    function clickEvent() {
+      if (inPreviousManagement) {return}
+      getById("round").removeEventListener("click", clickEvent)
+      resolve()
     }
 
-    host.warCards = []
-    pleb.warCards = []
+    getById("round").addEventListener("click", clickEvent)
 
-    getById("round").setAttribute("onclick", "hostPlaceDownCard()")
-
-    getById("playerCardsNum").innerHTML = `${host.username} Cards: ${host.cards.length}`
-    getById("cpuCardsNum").innerHTML = `${pleb.username} Cards: ${pleb.cards.length}`
-
-    hideCard("cpuCards")
-    hideCard("playerCards")
-
-    getById("outerPlayerCards").style.width = "40%"
-    getById("outerCPUCards").style.width = "40%"
-
-    inWar = false
-    host.placedDownCard = false
-    pleb.placedDownCard = false
-
-    streak = 0
-    lastResult = "none"
-    inPreviousManagement = false
-  }
+    if (usersData[host].cards.length == 0) {
+      resolve(null)
+      getById("round").removeEventListener("click", clickEvent)
+    }
+  })
 }
 
-function plebPlacedDownCard(event, from) {
-  if (checkIfChatMsg(event, from)) {return}
+async function placeCardMulti(deck) {
+  hideCard("card")
 
-  pleb.placedDownCard = true
-  if (inWar) {
-    multiWarRoundHost()
-    return
-  }
+  let card = deck[0]
+  removeItem(deck, card)
 
-  multiRoundHost()
+  deckCards.push(card)
+
+  showCard(card, "card")
+
+  return card
 }
 
-function hostPlaceDownCard() {
-  host.placedDownCard = true
-  getById("whoWon").innerHTML = "Waiting For Other Player To Place Card"
+function waitForSlap() {
+  return new Promise(function (resolve) {
+    resolveFunc = resolve
 
-  if (inWar) {
-    multiWarRoundHost()
-    return
-  }
+    onMessageFrom = function(event, from) {
+      if (checkIfChatMsg(event, from)) {return}
 
-  multiRoundHost()
+      let eventData = JSON.parse(event.data)
+
+      resolveFunc(eventData.from)
+      
+      getById("cardImg").removeEventListener("click", clickEventFunc)
+
+      onMessageFrom = function() {checkIfChatMsg(event, from)}
+    }
+
+    getById("cardImg").addEventListener("click", function clickEvent() {
+      resolveFunc(host)
+
+      clickEventFunc = clickEvent
+
+      getById("cardImg").removeEventListener("click", clickEvent)
+
+      onMessageFrom = function() {checkIfChatMsg(event, from)}
+    })
+  })
 }
 
-function resetGameHost() {
-  host.cards = []
-  pleb.cards = []
-  host.warCards = []
-  pleb.warCards = []
-  host.placedDownCard = false
-  pleb.placedDownCard = false
-  inWar = false
+function checkIfPlayerHasAllCards() {
+  for (const [key, value] of Object.entries(usersData)) {
+    if (value.cards.length == totalCards) {
+      return value.username
+    }
+  }
 
-  resetCards()
+  return false
+}
 
-  let start = startGame(host.cards, pleb.cards, 8)
-  host.cards = start[0]
-  pleb.cards = start[1]
+async function resetGame() {
+  resetCards()  
 
-  getById("playerCardsNum").innerHTML = `${host.username} Cards: 26`
-  getById("cpuCardsNum").innerHTML = `${pleb.username} Cards: 26`
-  getById("opponentName").innerText = `${pleb.username} Cards`
+  getById("cardNum").innerHTML = ""
 
-  getById("whoWon").innerHTML = "Click Place Card"
+  usersCards = []
+  users.forEach(function(user) {
+    usersCards.push([])
+  })
 
-  broadcast('')
+  onUserLeft = onUserLeave
+
+  usersCards = dealCardsMulti(usersCards)
+
+  usersData = {}
+  let i = 0
+
+  totalCards = 0
+
+  users.forEach((item) => {
+    usersData[item] = {cards: usersCards[i], username: item}
+    totalCards += usersData[item].cards.length
+    i++
+  })
+
+  await gameHost()
 }
 
 function checkIfChatMsg(event, from) {
