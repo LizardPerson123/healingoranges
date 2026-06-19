@@ -89,7 +89,7 @@ function joinSession(username, password, sessionID) {
         case ("USERNAME AND PASSWORD REQUIRED"): alert("Please Provide Username And Password"); break
         case ("NO SESSION"): alert("No Session"); break
         case ("ACCOUNT BANNED"): alert("Your Account Is Banned, View Your Account Page For More Information"); break
-        default: alert("Something Happened")
+        default: alert(err)
       }
 
       window.location.reload()
