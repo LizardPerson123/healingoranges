@@ -54,7 +54,7 @@ addEventListener("pageshow", function() {
     const origin = urlParams.get('origin')
 
     if (origin == "rotpear") {
-      getById("back").onclick = () => {window.location.href = '../../index.html'}
+      getById("back").onclick = () => {window.location.href = '../../cardgame.html'}
     }
     else if (origin == "about") {
       getById("back").onclick = () => {window.location.href = '../../about-cardgame.html'}
