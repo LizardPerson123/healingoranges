@@ -19,14 +19,6 @@ function getBetNum(event) {
     usersData = eventData.usersData
     let betAmount = handleBettingMulti(usersData[player].score)
 
-    sendTo(host, JSON.stringify({"betAmount": betAmount}))
-
-    getById("currentlyPlaying").style.display = "block"
-    getById("playerNum").style.display = "none"
-    getById("dealerNum").style.display = "none"
-    getById("currentlyPlaying").innerHTML = "Waiting For Other Players..."
-    getById("multiplayerJoin").innerHTML = "<h1>Waiting For Other Players</h1>"
-
     onMessageFrom = async function(event) {
       onMessageFrom = async function(event, from) {
         getById("chatButton").style.display = "inline-block"
@@ -108,6 +100,8 @@ function getBetNum(event) {
 
             onMessageFrom = getBetNum
           }
+
+
         }
 
         else if (eventData.msg == "message") {
@@ -164,6 +158,14 @@ function getBetNum(event) {
         }
       }
     }
+
+    sendTo(host, JSON.stringify({"betAmount": betAmount}))
+
+    getById("currentlyPlaying").style.display = "block"
+    getById("playerNum").style.display = "none"
+    getById("dealerNum").style.display = "none"
+    getById("currentlyPlaying").innerHTML = "Waiting For Other Players..."
+    getById("multiplayerJoin").innerHTML = "<h1>Waiting For Other Players</h1>"
   }
 }
 
@@ -264,7 +266,7 @@ async function handleBeginning() {
         getById("outer" + key).style.display = "block"
         currentlyShowing = key
 
-        broadcast(JSON.stringify({msg: "getCard", username: key}))
+        await broadcast(JSON.stringify({msg: "getCard", username: key}))
 
         if (key == host) {
           await hostCard(key, value)
