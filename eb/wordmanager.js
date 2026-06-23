@@ -37,12 +37,14 @@ function setEbolaInterval(difficultyVar) {
     let choice = getRndInteger(0, curedList.length)
     let toReturn = curedList[choice]
 
+    if (toReturn === ". ") {return}
+
     await addEbola(choice, checkForGameOver)
 
     return toReturn
   }
   
-  //See Comment
+  //See Comment Above
   expandFunction = interval1Func
 
   if (gamemode == "attack") {
@@ -68,10 +70,11 @@ function setEbolaInterval(difficultyVar) {
           if (direction == 1) {value += 1}
           else {value -= 1}
 
-          if (curedList.indexOf(value) == -1) {
+          if (curedList.indexOf(value) == -1 || curedList[curedList.indexOf(value)] === ". ") {
             i++
             return
           }
+
 
           await addEbola(curedList.indexOf(value))
 
@@ -112,8 +115,6 @@ async function addEbola(choice, checkForGameOver = false) {
   if (ebolaList.length >= 10 && !checkForGameOver) {
     await manageGameFinished(score)
   }
-
-  
 }
 
 async function addToScore(amount) {
