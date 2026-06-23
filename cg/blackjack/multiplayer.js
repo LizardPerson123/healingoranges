@@ -161,7 +161,7 @@ async function beginRound() {
 
     await handleBeginning()
   }
-   
+
   await broadcast(JSON.stringify({msg: "getBetNum", usersData: usersData}))
 
   usersData[host].betAmount = handleBettingMulti(usersData[host].score)

@@ -15,18 +15,27 @@ function getBetNum(event) {
     getById("userList").innerHTML = ""
 
     eventData = JSON.parse(eventData.content)
-
     usersData = eventData.usersData
+
     let betAmount = handleBettingMulti(usersData[player].score)
+    sendTo(host, JSON.stringify({"betAmount": betAmount}))
 
-    onMessageFrom = async function(event) {
+    getById("currentlyPlaying").style.display = "block"
+    getById("playerNum").style.display = "none"
+    getById("dealerNum").style.display = "none"
+    getById("currentlyPlaying").innerHTML = "Waiting For Other Players..."
+    getById("multiplayerJoin").innerHTML = "<h1>Waiting For Other Players</h1>"
+
       onMessageFrom = async function(event, from) {
-        getById("chatButton").style.display = "inline-block"
-
         let eventData = JSON.parse(event.data)
 
         if (eventData.from == host) {
           eventData = JSON.parse(eventData.content)
+          console.log(eventData.msg)
+
+          if (eventData.msg == "dealer") {await dealerNumShow(event)}
+          else {getById("chatButton").style.display = "inline-block"}
+
           if (eventData.msg == "getCard") {
             await waitForCardsBeingShown()
 
@@ -100,73 +109,15 @@ function getBetNum(event) {
 
             onMessageFrom = getBetNum
           }
-
-
+          
         }
 
         else if (eventData.msg == "message") {
           chat.register(from, eventData.chat)
         }
       }
-
-      let eventData = JSON.parse(event.data)
-      let from = eventData.from
-      eventData = JSON.parse(eventData.content)
-      let card = eventData.card
-
-      if (from == host) {
-        users = await getMembersApi()
-
-        getById("multiplayerJoin").style.display = "none"
-        getById("outer").style.display = "grid"
-        getById("outerPlayer").style.display = "none"
-
-        showPlayersCards()
-
-        removeItem(users, player)
-        users = [player].concat(users)
-
-        getById("dealerNum").style.display = "block"
-        getById("playerNum").style.display = "block"
-        getById("dealerNum").innerHTML = `Dealer Number: ${card[0][1]}`
-        showCard("dealerCards", card[1])
-
-        usersData = eventData.usersData
-
-        for (const [key, value] of Object.entries(usersData)) { 
-          for (card of value.cards) {
-            showCard(`${key}cards`, card)
-          }
-
-          if (key == player) {
-            for (card of value.cards) {
-              if (card[1] > 10) {
-                card[1] = 10
-              }
-
-              plebNum += card[1]
-            }
-
-            getById("playerNum").innerText = `Your Number: ${plebNum}`
-          }
-        }   
-
-        onUserLeft = function(event) {
-          let eventData = JSON.parse(event.data)
-
-          getById(`outer${eventData.username}`).remove()
-        }
-      }
+      
     }
-
-    sendTo(host, JSON.stringify({"betAmount": betAmount}))
-
-    getById("currentlyPlaying").style.display = "block"
-    getById("playerNum").style.display = "none"
-    getById("dealerNum").style.display = "none"
-    getById("currentlyPlaying").innerHTML = "Waiting For Other Players..."
-    getById("multiplayerJoin").innerHTML = "<h1>Waiting For Other Players</h1>"
-  }
 }
 
 function showPlayersCards() {
@@ -233,6 +184,7 @@ async function handleBeginning() {
     }
 
     await broadcast(JSON.stringify({msg: "dealer", card: card, usersData: usersData}))
+    console.log("ONE")
 
     onUserLeft = async function(event) {
       let eventData = JSON.parse(event.data)
@@ -265,7 +217,8 @@ async function handleBeginning() {
         getById("outerDealer").style.display = "none"
         getById("outer" + key).style.display = "block"
         currentlyShowing = key
-
+        
+        console.log("TWO")
         await broadcast(JSON.stringify({msg: "getCard", username: key}))
 
         if (key == host) {
@@ -490,4 +443,55 @@ function checkIfChatMsg(event, from) {
     if (eventData.msg == "message") {chat.register(from, eventData.chat); return true}
   }
   catch(e) {}
+}
+
+async function dealerNumShow(event) {
+  let eventData = JSON.parse(event.data)
+  let from = eventData.from
+  eventData = JSON.parse(eventData.content)
+  let card = eventData.card
+
+  if (from == host) {
+    users = await getMembersApi()
+
+    getById("multiplayerJoin").style.display = "none"
+    getById("outer").style.display = "grid"
+    getById("outerPlayer").style.display = "none"
+
+    showPlayersCards()
+
+    removeItem(users, player)
+    users = [player].concat(users)
+
+    getById("dealerNum").style.display = "block"
+    getById("playerNum").style.display = "block"
+    getById("dealerNum").innerHTML = `Dealer Number: ${card[0][1]}`
+    showCard("dealerCards", card[1])
+
+    usersData = eventData.usersData
+
+    for (const [key, value] of Object.entries(usersData)) { 
+      for (card of value.cards) {
+        showCard(`${key}cards`, card)
+      }
+
+      if (key == player) {
+        for (card of value.cards) {
+          if (card[1] > 10) {
+            card[1] = 10
+          }
+
+          plebNum += card[1]
+        }
+
+        getById("playerNum").innerText = `Your Number: ${plebNum}`
+      }
+    }   
+
+    onUserLeft = function(event) {
+      let eventData = JSON.parse(event.data)
+
+      getById(`outer${eventData.username}`).remove()
+    }
+  }
 }
