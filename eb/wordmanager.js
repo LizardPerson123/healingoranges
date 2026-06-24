@@ -36,8 +36,9 @@ function setEbolaInterval(difficultyVar) {
   async function interval1Func(checkForGameOver = false) {
     let choice = getRndInteger(0, curedList.length)
     let toReturn = curedList[choice]
-
-    if (toReturn === ". ") {return}
+    
+    //If Chosen Word Is A Period (And There Is Actual Text), Do Not Apply Ebola
+    if ((getById(toReturn).innerText === ". " || getById(toReturn).innerText === ".") && idList.length > 1 && !allPeriods()) {return}
 
     await addEbola(choice, checkForGameOver)
 
@@ -69,8 +70,9 @@ function setEbolaInterval(difficultyVar) {
           let direction = getRndInteger(0, 2) //0 is left, 1 is right
           if (direction == 1) {value += 1}
           else {value -= 1}
-
-          if (curedList.indexOf(value) == -1 || curedList[curedList.indexOf(value)] === ". ") {
+          
+          //If Chosen Word Does Not Exist, Or Is A Period (And There Is Actual Text), Do Not Apply Ebola
+          if (curedList.indexOf(value) == -1 || ((getById(toReturn).innerText === ". " || getById(toReturn).innerText === ".") && idList.length > 1 && !allPeriods())) {
             i++
             return
           }
@@ -265,6 +267,17 @@ async function beginTimeAttack() {
   }
 
   b()
+}
+
+function allPeriods() {
+  let allPeriods = true
+
+  idList.forEach(function(id) {
+    let text = getById(id).innerText
+    if (!(text === ". " || text == ".")) {allPeriods = false}
+  })
+
+  return allPeriods
 }
 
 //joke code, i cannot explain

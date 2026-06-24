@@ -7,9 +7,6 @@
   <link rel="stylesheet" href="main.css">
   <link rel="stylesheet" href="dropdown.css">
   <link rel="icon" type="image/icon-x" href="ebola.png">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Comic+Relief:wght@400;700&family=Playwrite+HU:wght@100..400&display=swap" rel="stylesheet">
 </head>
 <body>
   <div id="dropdiv" style="position: absolute; top: 10px; left: 10px;">
@@ -39,6 +36,7 @@
 
   <div id="ebolaCanvas">
     <p id="start" style="display: none; font-size: 1em;"></p>
+    <p id="coolTip" style="display: none; font-size: 0.9em; color: green;"></p>
 
     <div id="difficulty" style="display: none;">
       <button id="start1" style="text-decoration: none; display: block; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #34eb3a; font-size: 1.3em; background: none; border: solid;" onclick="text = start(0).then(value => text = value)">Easy Mode</button>

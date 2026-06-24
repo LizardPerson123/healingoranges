@@ -15,6 +15,8 @@ async function start(difficulty) {
   getById("start").style.display = "block"
   getById("start").innerText = "Loading... This May Take A Few Seconds"
 
+  coolTip()
+
   getById("start1").style.display = "none"
   getById("start2").style.display = "none"
   getById("start3").style.display = "none"
@@ -29,6 +31,14 @@ async function start(difficulty) {
 
   setEbolaInterval(difficulty)
   return text
+}
+
+function coolTip() {
+  let coolTips = ["Wipeouts Will Cure All Words With Ebola", "Ebola Words Difficulties Change How Fast Words Get Ebola", "Check Out Ebola Words' Achievements On Rotting Pears!", "Periods Can't Get Ebola On Their Own!", "Words With Ebola Will Infect Nearby Words", "Check Out The Leaderboard", "Check Out The How To Play Page"]
+  let chosenTip = getRndInteger(0, coolTips.length)
+  chosenTip = coolTips[chosenTip]
+  getById("coolTip").style.display = "inline"
+  getById("coolTip").innerText = chosenTip
 }
 
 let id = 1
