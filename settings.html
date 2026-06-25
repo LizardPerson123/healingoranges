@@ -104,7 +104,7 @@
         user = await getDataApi(username)
         user.name.a
       }
-      catch (err) {alert("Error Occured"); window.location.reload()}
+      catch (err) {alert("Error Occured"); historyPush("one")}
 
       getById("name").innerText = user.name
       getById("level").innerText = "Level " + user.level
