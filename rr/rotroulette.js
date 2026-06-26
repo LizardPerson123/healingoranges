@@ -234,7 +234,7 @@ class Vodka extends Alcohol {
           status.innerHTML +=  `<p id='alcohol${alcohol.id}' onclick='displayAlcoholInfo("${alcohol.name}", "${alcohol.description}", "${alcohol.img}")' style="font-size: 2em; margin-top: 1px; margin-bottom: 0px">${alcohol.name}</p>`
         })
 
-        if (stealFrom.activeAlcohol.length != 0 && stealFrom.activeAlcohol[0].name == "Vodka" && stealFrom.activeAlcohol.length == 1 && player.type == "Human") {
+        if (stealFrom.activeAlcohol[0].name == "Vodka" && stealFrom.activeAlcohol.length == 1 && player.type == "Human") {
           achi.register("Pointless", "bronze")
         }
 
@@ -384,7 +384,7 @@ class Gin extends Alcohol {
     const effectMsg = "Shield"
     const effectTurns = 3
 
-    this.AlcoholEffect = new Effect(effectMsg, effectTurns, function onDamage(player, attacker) {
+    this.AlcoholEffect = new Effect(effectMsg, effectTurns, function onDamage(player, attacker=player) {
       if (getRndInt(1, 3) == 1 && !(player.id === attacker.id)) {
         attacker.damage(1)
         
