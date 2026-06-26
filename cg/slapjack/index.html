@@ -32,11 +32,11 @@
     function showCard(card, id) {
       if (card[1] == 11) {
         getById(id).innerHTML += `
-          <img id='cardImg' class='hoverCard' onclick='rightSlap()' width="100%" src='../cards/${card[0]}-${card[1]}.svg' >
+          <img id='cardImg' class='hoverCard' onclick='rightSlap()' src='../cards/${card[0]}-${card[1]}.svg'>
         `
         return
       }
-      getById(id).innerHTML += `<img width="100%" class='hoverCard' id='cardImg' onclick='wrongSlap()' src='../cards/${card[0]}-${card[1]}.svg' >`
+      getById(id).innerHTML += `<img class='hoverCard' id='cardImg' onclick='wrongSlap()' src='../cards/${card[0]}-${card[1]}.svg'>`
     }
 
     function rightSlap() {
