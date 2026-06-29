@@ -107,7 +107,11 @@
         user = await getDataApi(username)
         user.name.a
       }
-      catch (err) {alert("Error Occured"); historyPush("one")}
+      catch (err) {alert("Error Occured"); historyPush("one"); window.location.reload()}
+
+      getById('one').style.display = 'none'
+      getById('four').style.display = 'flex'
+      historyPush('four')
 
       getById("name").innerText = user.name
       getById("level").innerText = "Level " + user.level
@@ -130,6 +134,8 @@
     async function viewAccounts() {
       additionalSectionsShowing.push("six")
       let accounts = await getUsers(getById("search").value)
+      getById('five').style.display = 'none'
+      getById('six').style.display = 'block'
 
       accounts.forEach(function(account) {
         getById("six").innerHTML += `<p onclick="getById(\'six\').style.display = \'none\'; getById(\'seven\').style.display = \'flex\'; seeAccounts('${account}'); historyPush('seven', '${account}')">${account}</p>`
@@ -161,8 +167,6 @@
       document.addEventListener('keydown', onKeyHandler)
       function onKeyHandler(e) {
         if (e.keyCode === 13) {
-          getById('five').style.display = 'none'
-          getById('six').style.display = 'block'
           viewAccounts()
           document.removeEventListener("keydown", onKeyHandler)
         }
@@ -330,7 +334,7 @@
       <p style="color: black;">Sign In</p>
     </div>
 
-    <div style="background-color: white; width: 16em;" onclick="yourAccount(); getById('one').style.display = 'none'; getById('four').style.display = 'flex'; historyPush('four')" class="option">
+    <div style="background-color: white; width: 16em;" onclick="yourAccount()" class="option">
       <img src="images/settings.svg" style="width: 8em; image-rendering: pixelated; margin-bottom: 2em; margin-top: 1em;">
       <p style="color: black;">Your Account</p>
     </div>
@@ -411,7 +415,7 @@
     <h1 style="margin-bottom: 0.7em;">Find Account</h1>
     <p>Search For An Account Below</p>
     <input type="text" id="search" name="search" style="width: 60%; border: solid; margin-bottom: 1em; border-radius: 1.5em; font-size: 1.5em; padding-top: 10px; padding-bottom: 10px;"><br>
-    <button style="padding-left: 20px; padding-right: 20px; background-color: rgb(23, 204, 23);" onclick="getById('five').style.display = 'none'; getById('six').style.display = 'block'; viewAccounts();">Search</button>
+    <button style="padding-left: 20px; padding-right: 20px; background-color: rgb(23, 204, 23);" onclick="viewAccounts();">Search</button>
   </div>
 
   <div id="six" style="display: none;">
