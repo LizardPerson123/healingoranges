@@ -91,7 +91,10 @@ async function beginGameHost() {
 
   getById("multiplayerNewMenu").style.display = "none"
   getById("game").style.display = gameDisplay
-  getById("msgPreview").style.display = "block"
+
+  if (gameDisplay == "grid") {
+    getById("msgPreview").style.display = "block"
+  }
 
   users = await getMembersApi()
 
