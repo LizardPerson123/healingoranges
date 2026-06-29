@@ -29,9 +29,9 @@
         localStorage.setItem("beenHere", Number(localStorage.getItem("beenHere") || 0) + 1)
       } 
 
-      getById("dropdiv").addEventListener("mousedown", () => {
+      getById("dropdiv").addEventListener("click", () => {
         getById("dropdivStyle").innerHTML = `
-        .dropdown-content a {background-color: #ddd;}
+        .dropdown-content a:hover {background-color: #ddd;}
         
         .dropdown .dropdown-content {display: block;}
 
@@ -40,6 +40,7 @@
 
       getById("dropdiv").addEventListener("mouseout", () => {
         getById("dropdivStyle").innerHTML = ""
+        alert('a')
       })
     })
   </script>
