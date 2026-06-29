@@ -124,8 +124,13 @@ async function addToScore(amount) {
   getById("score").innerText = "Score: " + score
 
   if (text[id] === undefined) {
-    let newText = await GetText()
-    newText = newText.split(".")
+    let newText
+    do {
+      newText = await GetText()
+      newText = newText.split(".")
+    }
+    while(newText[0] == "")
+    
     text = text.concat(newText)
   }
 
