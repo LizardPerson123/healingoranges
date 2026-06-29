@@ -5,14 +5,12 @@ function letThereBeDark() {
       background-color: #0d0e0e
     }
     
-    .playerOption {
+    .playerOption{
       background-color: white;
       color: black;
     }
 
-    .startButton {color: white}
-
-    .startGameButton {color: white}
+    .startButton, #showMsgButton, .startGameButton {color: white}
   `
 
   localStorage.setItem("mode", "dark")
