@@ -21,15 +21,15 @@ function setEbolaInterval(difficultyVar) {
   
   switch (difficultyVar) {
     case (0): infectWordSpeed = 1500; break
-    case (1): infectWordSpeed = 1100; break
-    case (2): infectWordSpeed = 800; break
+    case (1): infectWordSpeed = 1300; break
+    case (2): infectWordSpeed = 900; break
   }
 
   if (gamemode == "triple") {
     switch (difficultyVar) {
       case (0): infectWordSpeed = 1800; break
-      case (1): infectWordSpeed = 1500; break
-      case (2): infectWordSpeed = 1200; break
+      case (1): infectWordSpeed = 1600; break
+      case (2): infectWordSpeed = 1300; break
     }
   }
 
