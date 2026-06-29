@@ -29,8 +29,16 @@
   display: block;
 }
 
-.dropdown-content a:hover {background-color: #ddd;}
+@media (hover: hover) {
+  .dropdown-content a:hover {background-color: #ddd;}
 
-.dropdown:hover .dropdown-content {display: block;}
+  .dropdown:hover .dropdown-content {display: block;}
 
-.dropdown:hover .dropbtn {background-color: #3e8e41;}
+  .dropdown:hover .dropbtn {background-color: #3e8e41;}
+}
+
+.dropdown-content a:click {background-color: #ddd;}
+
+.dropdown:click .dropdown-content {display: block;}
+
+.dropdown:click .dropbtn {background-color: #3e8e41;}
