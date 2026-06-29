@@ -126,6 +126,7 @@
     }
 
     async function viewAccounts() {
+      additionalSectionsShowing.push("six")
       let accounts = await getUsers(getById("search").value)
 
       accounts.forEach(function(account) {
@@ -412,7 +413,7 @@
     <h1 style="margin-bottom: 0.7em;">Find Account</h1>
     <p>Search For An Account Below</p>
     <input type="text" id="search" name="search" style="width: 60%; border: solid; margin-bottom: 1em; border-radius: 1.5em; font-size: 1.5em; padding-top: 10px; padding-bottom: 10px;"><br>
-    <button style="padding-left: 20px; padding-right: 20px; background-color: rgb(23, 204, 23);" onclick="getById('five').style.display = 'none'; getById('six').style.display = 'block'; viewAccounts(); additionalSectionsShowing.push('six')">Search</button>
+    <button style="padding-left: 20px; padding-right: 20px; background-color: rgb(23, 204, 23);" onclick="getById('five').style.display = 'none'; getById('six').style.display = 'block'; viewAccounts();">Search</button>
   </div>
 
   <div id="six" style="display: none;">
