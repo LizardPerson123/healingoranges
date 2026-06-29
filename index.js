@@ -19,7 +19,7 @@ function letThereBeDark() {
     }
 
     h1 {
-      text-shadow: 2px 2px 2px rgba(128, 128, 128, 0.8)
+      text-shadow: 0px 0px 0px rgba(128, 128, 128, 0.0)
     }
 
     .option {box-shadow: 15px 15px 15px rgba(255, 255, 255, 0.4);}
