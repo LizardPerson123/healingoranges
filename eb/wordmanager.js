@@ -64,7 +64,7 @@ function setEbolaInterval(difficultyVar) {
         //Has To Be Explicitly Converted To A Number For Some Reason
         value = Number(Object.keys(ebolaList[i])[0])
 
-        infectNearbyWord = getRndInteger(1, 7) == 1
+        infectNearbyWord = getRndInteger(1, 10) == 1
         
         if (infectNearbyWord && !clearedIntervals) { 
           let direction = getRndInteger(0, 2) //0 is left, 1 is right
