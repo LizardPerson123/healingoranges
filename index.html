@@ -29,6 +29,18 @@
         localStorage.setItem("beenHere", Number(localStorage.getItem("beenHere") || 0) + 1)
       } 
     })
+
+    function preLoadImg(imgName) {
+      let img = new Image()
+      img.src = imgName
+    }
+
+    preLoadImg("favicon.ico")
+    preLoadImg("images/ebola.png")
+    preLoadImg("images/rotroulette.png")
+    preLoadImg("images/cardgame.png")
+    preLoadImg("images/house.svg")
+    preLoadImg("images/account.svg")
   </script>
 
 </head>
