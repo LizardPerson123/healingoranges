@@ -21,7 +21,7 @@ async function start(difficulty) {
   getById("start2").style.display = "none"
   getById("start3").style.display = "none"
 
-  let text
+  let text = []
   do {
     text = await GetText()
     text = text.split(".")
