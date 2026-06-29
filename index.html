@@ -29,7 +29,7 @@
         localStorage.setItem("beenHere", Number(localStorage.getItem("beenHere") || 0) + 1)
       } 
 
-      getById("dropdiv").addEventListener("click", () => {
+      getById("dropdiv").addEventListener("mousedown", () => {
         getById("dropdivStyle").innerHTML = `
         .dropdown-content a:active {background-color: #ddd;}
         
