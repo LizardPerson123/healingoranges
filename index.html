@@ -12,18 +12,6 @@
   <link rel="icon" type="image/icon-x" href="favicon.ico">
 
   <script>
-    getById("dropdiv").addEventListener("mouseover", () => {
-      getById("dropdivStyle").innerHTML = `
-      .dropdown-content a:active {background-color: #ddd;}
-
-      .dropdown:active .dropdown-content {display: block;}
-
-     .dropdown:active .dropbtn {background-color: #3e8e41;}`
-    })
-
-    getById("dropdiv").addEventListener("mouseout", () => {
-      getById("dropdivStyle").innerHTML = ``
-    })
   </script>
 
   <style id="styleTag"></style>
@@ -40,6 +28,19 @@
         getById("what").onclick = () => {window.location.href = 'about.html'}
         localStorage.setItem("beenHere", Number(localStorage.getItem("beenHere") || 0) + 1)
       } 
+
+      getById("dropdiv").addEventListener("mouseover", () => {
+        getById("dropdivStyle").innerHTML = `
+        .dropdown-content a:active {background-color: #ddd;}
+
+        .dropdown:active .dropdown-content {display: block;}
+
+       .dropdown:active .dropbtn {background-color: #3e8e41;}`
+      })
+
+      getById("dropdiv").addEventListener("mouseout", () => {
+        getById("dropdivStyle").innerHTML = ``
+      })
     })
   </script>
 
