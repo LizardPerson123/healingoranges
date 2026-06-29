@@ -31,11 +31,15 @@
 
       getById("dropdiv").addEventListener("mousedown", () => {
         getById("dropdivStyle").innerHTML = `
-        .dropdown-content a:active {background-color: #ddd;}
+        .dropdown-content a {background-color: #ddd;}
         
-        .dropdown:active .dropdown-content {display: block;}
+        .dropdown .dropdown-content {display: block;}
 
-       .dropdown:active .dropbtn {background-color: #3e8e41;}`
+       .dropdown:hover .dropbtn {background-color: #3e8e41;}`
+      })
+
+      getById("dropdiv").addEventListener("mouseout", () => {
+        getById("dropdivStyle").innerHTML = ""
       })
     })
   </script>
