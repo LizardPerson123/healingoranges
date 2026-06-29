@@ -1,51 +1,12 @@
-async function start(difficulty) {
-  achi.register("Play Ebola Words", "bronze")
-
-  let gameModesPlayed = localStorage.getItem("gameModes") || []
-  if (gameModesPlayed == "") {gameModesPlayed = []}
-  else {gameModesPlayed = JSON.parse(gameModesPlayed)}
-
-  if (!(gameModesPlayed.includes(gamemode))) {gameModesPlayed.push(gamemode)}
-  if (gameModesPlayed.length == 3) {achi.register("Health Care", "bronze")}
-  localStorage.setItem("gameModes", JSON.stringify(gameModesPlayed))
-
-  getById("score").style.display = "block"
-  getById("ebola").style.display = "block"
-  getById("ebolaCanvas").style.display = "block"
-  getById("start").style.display = "block"
-  getById("start").innerText = "Loading... This May Take A Few Seconds"
-
-  coolTip()
-
-  getById("start1").style.display = "none"
-  getById("start2").style.display = "none"
-  getById("start3").style.display = "none"
-
-  let text = await GetText()
-  text = text.split(".")
-  text[0] += ". "
-
-  getById("ebolaCanvas").innerHTML = parseText(text[0])
-  idList = Array.from(Array(text[0].split(" ").length-1).keys())
-  curedList = Array.from(Array(text[0].split(" ").length-1).keys())
-
-  setEbolaInterval(difficulty)
-  return text
+let textOptions = ["It Exists!", "Touch Grass!", "The Design Is Very Human!", "Dishes... Dishes A Bad Joke", "Also Try Youtube!", "Where Are Your Fingers", "Also Try Zorbeez!", "Donate To Wikipedia!", "It's Free!", "Featuring Ebola Words!", "Featuring Rotting Roulette!", "Removed Herobrione!", "DougDoug Is Bald!", "Rigged!", "50+ Achievements!", "Slightly Below Expectations!", "The Most Convoluted Way To Use Wikipedia!", "In Beta!",
+  "Version Beta 1.0.0!", "Used To Be Worse!", "Featuring Dark Mode!", "Breaks All Good Code Practices!", "Error: Could Not Load Splash Text", "It Exists?", "Best Thing Sinced Sliced Bread!",
+  "Some Splash Texts Are Hyper Specific!", "We Block AI!", "Coded By One Man!", "Art By One Man!", "Uses HTML 5!", "Uses The World Wide Web!", "Does Not Use Dial Up!", "Uses Cloudflare!", "Uses GitHub!", "Uses HTTPS!", "Uses JavaScript!",
+  "Speeling Is Me Pasion!"
+]
+function generateSubtext() {
+  getById("subtext").innerText = textOptions[getRndInteger(0, textOptions.length)]
 }
-
-function coolTip() {
-  let coolTips = ["Wipeouts Will Cure All Words With Ebola", "Ebola Words Difficulties Change How Fast Words Get Ebola", "Check Out Ebola Words' Achievements On Rotting Pears!", "Periods Can't Get Ebola On Their Own!", "Words With Ebola Will Infect Nearby Words", "Check Out The Leaderboard", "Check Out The How To Play Page"]
-  let chosenTip = getRndInteger(0, coolTips.length)
-  chosenTip = coolTips[chosenTip]
-  getById("coolTip").style.display = "inline"
-  getById("coolTip").innerText = chosenTip
-}
-
-let id = 1
-
-console.log("v2.0.0")
 
 addEventListener("pageshow", function() {
-  ApplyMode()
-  GetHighScore()
+  generateSubtext()
 })

@@ -72,7 +72,7 @@ function setEbolaInterval(difficultyVar) {
           else {value -= 1}
           
           //If Chosen Word Does Not Exist, Or Is A Period (And There Is Actual Text), Do Not Apply Ebola
-          if (curedList.indexOf(value) == -1 || ((getById(toReturn).innerText === ". " || getById(toReturn).innerText === ".") && idList.length > 1 && !allPeriods())) {
+          if (curedList.indexOf(value) == -1 || ((getById(value).innerText === ". " || getById(value).innerText === ".") && idList.length > 1 && !allPeriods())) {
             i++
             return
           }
