@@ -29,12 +29,6 @@
   display: block;
 }
 
-.dropdown-content a:active {background-color: #ddd;}
-
-.dropdown:active .dropdown-content {display: block;}
-
-.dropdown:active .dropbtn {background-color: #3e8e41;}
-
 @media (hover: hover) {
   .dropdown-content a:hover {background-color: #ddd;}
 
