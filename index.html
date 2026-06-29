@@ -30,7 +30,7 @@
       } 
 
       function touchShow() {
-         getById("dropDivStyle").removeEventListener("click", touchShow)
+         getById("dropdiv").removeEventListener("click", touchShow)
          getById("dropdivStyle").innerHTML = `
           .dropdown-content a:hover {background-color: #ddd;}
         
@@ -38,13 +38,13 @@
 
          .dropdown:hover .dropbtn {background-color: #3e8e41;}`
 
-        getById("dropdivStyle").addEventListener("click", touchHide)
+        getById("dropdiv").addEventListener("click", touchHide)
       }
 
       function touchHide() {
-        getById("dropDivStyle").removeEventListener("click", touchHide)
+        getById("dropdiv").removeEventListener("click", touchHide)
         getById("dropdivStyle").innerHTML = ``
-        getById("dropdivStyle").addEventListener("click", touchShow)
+        getById("dropdiv").addEventListener("click", touchShow)
       }
 
       getById("dropdiv").addEventListener("click", touchShow)
