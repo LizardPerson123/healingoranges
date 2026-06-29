@@ -29,22 +29,25 @@
         localStorage.setItem("beenHere", Number(localStorage.getItem("beenHere") || 0) + 1)
       } 
 
-      getById("dropdiv").addEventListener("click", () => {
-        getById("dropdivStyle").innerHTML = `
-        .dropdown-content a:hover {background-color: #ddd;}
+      function touchShow() {
+         getById("dropDivStyle").removeEventListener("click", touchShow)
+         getById("dropdivStyle").innerHTML = `
+          .dropdown-content a:hover {background-color: #ddd;}
         
-        .dropdown .dropdown-content {display: block;}
+          .dropdown .dropdown-content {display: block;}
 
-       .dropdown:hover .dropbtn {background-color: #3e8e41;}`
-      })
+         .dropdown:hover .dropbtn {background-color: #3e8e41;}`
 
-      getById("dropdiv").addEventListener("mouseout", () => {
-        getById("dropdivStyle").innerHTML = ""
-      })
+        getById("dropdivStyle").addEventListener("click", touchHide)
+      }
 
-      getById("dropdiv").addEventListener("touchend", () => {
-        getById("dropdivStyle").innerHTML = ""
-      })
+      function touchHide() {
+        getById("dropDivStyle").removeEventListener("click", touchHide)
+        getById("dropdivStyle").innerHTML = ``
+        getById("dropdivStyle").addEventListener("click", touchShow)
+      }
+
+      getById("dropdiv").addEventListener("click", touchShow)
     })
   </script>
 
