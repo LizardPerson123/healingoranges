@@ -21,17 +21,26 @@ function setEbolaInterval(difficultyVar) {
   
   switch (difficultyVar) {
     case (0): infectWordSpeed = 1500; break
-    case (1): infectWordSpeed = 1300; break
+    case (1): infectWordSpeed = 1100; break
     case (2): infectWordSpeed = 900; break
   }
+  
+  //Make Easier On Mobile
+  if (window.innerWidth < 500 && difficultyVar == 1) {infectWordSpeed = 1300}
 
   if (gamemode == "triple") {
     switch (difficultyVar) {
       case (0): infectWordSpeed = 1800; break
-      case (1): infectWordSpeed = 1600; break
-      case (2): infectWordSpeed = 1300; break
+      case (1): infectWordSpeed = 1500; break
+      case (2): infectWordSpeed = 1200; break
     }
+    
+    //Make Easier On Mobile
+    if (window.innerWidth < 500 && difficultyVar == 1) {infectWordSpeed = 1600}
+    if (window.innerWidth < 500 && difficultyVar == 2) {infectWordSpeed = 1200}
   }
+
+  alert(infectWordSpeed)
 
   async function interval1Func(checkForGameOver = false) {
     let choice = getRndInteger(0, curedList.length)
