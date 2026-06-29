@@ -40,7 +40,10 @@
 
       getById("dropdiv").addEventListener("mouseout", () => {
         getById("dropdivStyle").innerHTML = ""
-        alert('a')
+      })
+
+      getById("dropdiv").addEventListener("touchend", () => {
+        getById("dropdivStyle").innerHTML = ""
       })
     })
   </script>
