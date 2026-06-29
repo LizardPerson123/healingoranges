@@ -1,7 +1,6 @@
 function letThereBeLight() {
   getById("styleTag").innerHTML = ""
   getById("imgMode").src = "images/moon.svg"
-
   localStorage.setItem("mode", "light")
 }
 
@@ -19,7 +18,7 @@ function letThereBeDark() {
     }
 
     h1 {
-      text-shadow: 0px 0px 0px rgba(128, 128, 128, 0.0)
+      text-shadow: 2px 2px 2px rgba(128, 128, 128, 0.8)
     }
 
     .option {box-shadow: 15px 15px 15px rgba(255, 255, 255, 0.4);}
@@ -55,5 +54,7 @@ function toggleMode() {
 addEventListener("pageshow", function() {
   applyMode()
 })
+
+applyMode()
 
 console.log("Hey You, Yeah You. Do Not Put Anything Here If You Don't Know What You're Doing! If Someone Has Asked You To Put Something Here, Don't Trust Them! They Could Be Trying To Steal Your Personal Information, Like Usernames And Passwords")
