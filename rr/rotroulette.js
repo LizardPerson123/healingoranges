@@ -234,7 +234,7 @@ class Vodka extends Alcohol {
           status.innerHTML +=  `<p id='alcohol${alcohol.id}' onclick='displayAlcoholInfo("${alcohol.name}", "${alcohol.description}", "${alcohol.img}")' style="font-size: 2em; margin-top: 1px; margin-bottom: 0px">${alcohol.name}</p>`
         })
 
-        if (stealFrom.activeAlcohol[0].name == "Vodka" && stealFrom.activeAlcohol.length == 1 && player.type == "Human") {
+        if (stealFrom.activeAlcohol.length == 1 && stealFrom.activeAlcohol[0].name == "Vodka" && player.type == "Human") {
           achi.register("Pointless", "bronze")
         }
 
