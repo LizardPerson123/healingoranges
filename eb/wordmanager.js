@@ -40,8 +40,6 @@ function setEbolaInterval(difficultyVar) {
     if (window.innerWidth < 500 && difficultyVar == 2) {infectWordSpeed = 1200}
   }
 
-  alert(infectWordSpeed)
-
   async function interval1Func(checkForGameOver = false) {
     let choice = getRndInteger(0, curedList.length)
     let toReturn = curedList[choice]
