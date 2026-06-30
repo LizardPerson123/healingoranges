@@ -1,6 +1,7 @@
 let resolveShouldContinue
 let plebNum = 0
 let haveShownPlayerCards = false
+let shownDealerNum = false
 
 //When Host Asks For Bet Number
 function getBetNum(event) {
@@ -29,14 +30,18 @@ function getBetNum(event) {
       onMessageFrom = async function(event, from) {
         let eventData = JSON.parse(event.data)
 
-        if (eventData.from == host) {
+        if (JSON.parse(eventData.content).msg == "message") {
+          chat.register(from, JSON.parse(eventData.content).chat)
+        }
+        else if (eventData.from == host) {
           eventData = JSON.parse(eventData.content)
-          console.log(eventData.msg)
 
-          if (eventData.msg == "dealer") {await dealerNumShow(event)}
+          if (eventData.msg == "dealer") {shownDealerNum = event}
           else {getById("chatButton").style.display = "inline-block"}
 
           if (eventData.msg == "getCard") {
+            if (shownDealerNum) {await dealerNumShow(shownDealerNum); shownDealerNum = false}
+
             await waitForCardsBeingShown()
 
             getById("currentlyPlaying").innerHTML = `Currently Playing: ${eventData.username}`
@@ -110,10 +115,6 @@ function getBetNum(event) {
             onMessageFrom = getBetNum
           }
           
-        }
-
-        else if (eventData.msg == "message") {
-          chat.register(from, eventData.chat)
         }
       }
       
