@@ -230,8 +230,9 @@ async function beginTimeAttack() {
   let oldLength
   let time = 30
   let pauseTime = false
+  let level = 1
 
-  getById("score").style.display = "none"
+  getById("highscore").style.display = "none"
   getById("time").style.display = "block"
 
   setInterval(function() {if (pauseTime) {return}; time--; getById("time").innerHTML = "Time Left: " + time; if (time < 1) {alert("Game Over"); window.location.reload()}}, 1000)
