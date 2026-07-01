@@ -26,3 +26,9 @@ function isNumberKey(evt) {
     return false;
   return true;
 }
+
+function reload() {
+  document.querySelector("body").innerHTML = ""
+  window.location.reload()
+  throw "This Is Intentional"
+}

@@ -153,7 +153,7 @@
               players.forEach(function(player) {
                 if (player.hp > 0) {
                   alert(player.name + " Wins")
-                  window.location.reload()
+                  reload()
                 }
               })
             }
@@ -189,7 +189,7 @@
               catch {}
             }
 
-            window.location.reload()
+            reload()
           }
 
           else if (players[1].hp == 0 && players[2].hp == 0) {
@@ -224,7 +224,7 @@
               catch {}
             }
 
-            window.location.reload()
+            reload()
           }
         }
       }
@@ -395,7 +395,7 @@
 
         ws.onclose = function() {
           alert("Connection Disrupted")
-          window.location.reload()
+          reload()
         }
       })
     }

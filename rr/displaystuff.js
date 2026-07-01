@@ -118,7 +118,7 @@ function choseShoot(includePlayer = true) {
       getById("goBackButton").addEventListener("click", function() {
         getById("shootButtons").innerHTML = ""
         getById("shootButtons").style.display = "none"
-
+ 
         resolve("goBack")
       })
     }
