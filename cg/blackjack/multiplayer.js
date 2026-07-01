@@ -132,14 +132,12 @@ function checkIfCanBegin() {
 async function beginRound() {
   getById("multiplayerNewMenu").innerHTML = "<h1>Waiting For Other Players</h1>"
 
-  usersData[host].ready = true
-
   onMessageFrom = async function(event) {
     let eventData = JSON.parse(event.data)
     let from = eventData.from
     eventData = JSON.parse(eventData.content)
 
-    if (!isNaN(eventData.betAmount) && eventData.betAmount <= 5) {
+    if (!isNaN(eventData.betAmount) && eventData.betAmount <= eventData.score) {
       usersData[from].betAmount = eventData.betAmount
       usersData[from].ready = true
       await handleBeginning()
@@ -165,6 +163,7 @@ async function beginRound() {
   await broadcast(JSON.stringify({msg: "getBetNum", usersData: usersData}))
 
   usersData[host].betAmount = handleBettingMulti(usersData[host].score)
+  usersData[host].ready = true
 
   achi.register("Play Blackjack Multiplayer", "bronze")
 

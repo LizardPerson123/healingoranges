@@ -88,6 +88,7 @@ function getBetNum(event) {
 
           else if (eventData.msg == "endGame") {
             firstGetCard = true
+            getById("chatButton").style.display = "none"
             getById("outer").style.display = "none"
             getById("didBeat").style.display = "block"
             getById("dealerNum").innerHTML = "Dealer Number: " + eventData.dealer
@@ -185,12 +186,15 @@ async function handleBeginning() {
     }
 
     await broadcast(JSON.stringify({msg: "dealer", card: card, usersData: usersData}))
-    console.log("ONE")
 
     onUserLeft = async function(event) {
       let eventData = JSON.parse(event.data)
 
-      getById(`outer${eventData.username}`).remove()
+      playerCardDeck = getById(`outer${eventData.username}`)
+
+      if (playerCardDeck) {
+        playerCardDeck.remove()
+      }
 
       delete usersData[eventData.username]
 
@@ -390,6 +394,8 @@ function getBljCard() {
 async function restartGame() {
   resetCards()
   dealer = 0
+
+  getById("chatButton").style.display = "none"
   
   for (const [key, value] of Object.entries(usersData)) {
     if (value.score == 0) {
