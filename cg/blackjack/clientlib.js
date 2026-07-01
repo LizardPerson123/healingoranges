@@ -223,7 +223,6 @@ async function handleBeginning() {
         getById("outer" + key).style.display = "block"
         currentlyShowing = key
         
-        console.log("TWO")
         await broadcast(JSON.stringify({msg: "getCard", username: key}))
 
         if (key == host) {
