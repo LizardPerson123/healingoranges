@@ -9,7 +9,7 @@ function joinSession(username, password, sessionID) {
     try {
       let [hostName, usersList, assume] = await joinSessionApi(username, password, sessionID)
       
-      if (assume != "rotRoul") {alert("This Is Not A Rotting Roulette Session"); window.location.reload()}
+      if (assume != "rotRoul") {alert("This Is Not A Rotting Roulette Session"); reload()}
       
       host = hostName
       users = usersList

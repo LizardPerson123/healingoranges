@@ -18,7 +18,7 @@ function newSession(username, password) {
         let members = await getMembersApi()
         if (members.length < 2 && inGameBegin) {
           alert("Not Enough Players Anymore, " + eventData.username + " Left")
-          window.location.reload()
+          reload()
         }
 
         let removedUser = eventData.username
