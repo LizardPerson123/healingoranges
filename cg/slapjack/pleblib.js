@@ -53,7 +53,7 @@ async function gamePleb(event, from) {
   }
 
   else if (eventData.msg == "endGame") {
-    alert(`${eventData.username} Wins The Game`)
+    alert(`${eventData.winner} Wins The Game`)
     members.forEach(function(username) {
       getById("cardNum").innerHTML += `
         <p id="${username}Num" class="infoText">${username} Cards: ${Math.round(52 / users.length)}</p>
