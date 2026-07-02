@@ -4,13 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ebola Words</title>
+  <style id="dropdivStyle"></style>
   <link rel="stylesheet" href="main.css">
   <link rel="stylesheet" href="dropdown.css">
   <link rel="icon" type="image/icon-x" href="ebola.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Comic+Relief:wght@400;700&family=Smooch+Sans:wght@100..900&display=swap" rel="stylesheet">
-  <style id="dropdivStyle"></style>
 </head>
 <body>
   <div id="dropdiv" style="position: absolute; top: 10px; left: 10px;">
@@ -50,8 +50,8 @@
 
     <div id="chooseYourFighter">
       <button id="op1" style="text-decoration: none; display: block; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: rgb(34, 197, 107); font-size: 1.3em; background: none; border: solid;" onclick="getById('selectedMode').innerHTML = 'Selected Mode: Classic'; gamemode = 'classic'; getById('chooseYourFighter').style.display = 'none'; getById('difficulty').style.display = 'flex';">Classic</button>
-      <button id="op2" style="text-decoration: none; display: block; font-family: cursive; color: blueviolet; font-size: 1.3em; background: none; border: solid;" onclick="getById('selectedMode').innerHTML = 'Selected Mode: Triple Ebola'; gamemode = 'triple'; getById('chooseYourFighter').style.display = 'none'; getById('difficulty').style.display = 'flex'">Triple Ebola</button>
-      <button id="op3" style="text-decoration: none; display: block; font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif; color: red; font-size: 1.3em; background: none; border: solid;" onclick="getById('selectedMode').innerHTML = 'Selected Mode: Time Attack'; gamemode = 'attack'; getById('chooseYourFighter').style.display = 'none'; text = start(0).then(value => text = value)">Time Attack</button>
+      <button id="op2" style="text-decoration: none; display: block; font-family: cursive; color: blueviolet; font-size: 1.3em; background: none; border: solid;" onclick="getById('selectedMode').innerHTML = 'Selected Mode: Triple Ebola'; gamemode = 'triple'; getById('chooseYourFighter').style.display = 'none'; getById('highscore').innerHTML = 'High Score: ' + (localStorage.getItem('highscoretriple') || 0); getById('difficulty').style.display = 'flex'">Triple Ebola</button>
+      <button id="op3" style="text-decoration: none; display: block; font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif; color: red; font-size: 1.3em; background: none; border: solid;" onclick="getById('selectedMode').innerHTML = 'Selected Mode: Time Attack'; gamemode = 'attack'; getById('highscore').innerHTML = 'High Score: ' + (localStorage.getItem('highscoreattack') || 0); getById('chooseYourFighter').style.display = 'none'; text = start(0).then(value => text = value)">Time Attack</button>
       <button id="op4" style="text-decoration: none; display: block; font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif; color: gray; font-size: 1.3em; background: none; border: solid;" onclick="window.location.href = 'about.html'">How To Play</button>
     </div>
 
@@ -74,6 +74,5 @@
   <script src="main.js"></script>
   <script src="rotextensions.js"></script>
   <script src="dropdown.js"></script>
- 
 </body>
 </html>

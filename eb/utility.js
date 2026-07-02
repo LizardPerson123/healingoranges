@@ -37,10 +37,12 @@ async function manageGameFinished(score) {
 
     score += addToScore
 
-    let highscore = localStorage.getItem("highscore") || 0
+    if (gamemode == "classic") {gamemode = ""}
+
+    let highscore = localStorage.getItem("highscore" + gamemode) || 0
     let newHighScore = score > highscore
 
-    if (highscore >= 1000) {
+    if (score >= 1000) {
       let gameModesWith1000 = localStorage.getItem("gameModes1000") || []
       if (gameModesWith1000 == "") {gameModesWith1000 = []}
       else {gameModesWith1000 = JSON.parse(gameModesWith1000)}
@@ -52,19 +54,19 @@ async function manageGameFinished(score) {
       localStorage.setItem("gameModes1000", JSON.stringify(gameModesWith1000))
     }
 
-    if (!newHighScore || gamemode != "classic") {
+    if (!newHighScore) {
       await manageEnd(score)
     }
     else {
       alert("New High Score!")
       
-      if (score >= 100) {achi.laterRegi("Ebola Novice", "bronze")}
-      if (score >= 500) {achi.laterRegi("Ebola Medior", "silver")}
-      if (score >= 1000) {achi.laterRegi("Ebola Expert", "gold")}
+      if (score >= 100 && gamemode == "") {achi.laterRegi("Ebola Novice", "bronze")}
+      if (score >= 500 && gamemode == "") {achi.laterRegi("Ebola Medior", "silver")}
+      if (score >= 1000 && gamemode == "") {achi.laterRegi("Ebola Expert", "gold")}
 
       if (localStorage.getItem("highscore")) {achi.laterRegi("Even Higher", "bronze")}
 
-      localStorage.setItem("highscore", score)
+      localStorage.setItem("highscore" + gamemode, score)
 
       let preUsername = localStorage.getItem("username") || ""
       let prePassword = localStorage.getItem("password") || ""
@@ -100,7 +102,13 @@ async function manageGameFinished(score) {
             password = getById("password").value
           }
 
-          let isScoreCheck = await isScore(score, username)
+          let isScoreCheck
+
+          switch (gamemode) {
+            case ("triple"): {isScoreCheck = await isScoreTripleEbola(score, username); break}
+            case ("attack"): {isScoreCheck = await isScoreTimeAttack(score, username); break}
+            default: {isScoreCheck = await isScore(score, username)}
+          }
 
           if (isScoreCheck == "false") {
             throw "Score Not High Enough To Submit"
@@ -109,7 +117,13 @@ async function manageGameFinished(score) {
             throw "Error"
           }
         
-          let submitScoreChk = await submitScore(username, password, score)
+          let submitScoreChk
+
+          switch (gamemode) {
+            case ("triple"): {submitScoreChk = await submitScoreTripleEbola(username, password, score); break}
+            case ("attack"): {submitScoreChk = await submitScoreTimeAttack(username, password, score); break}
+            default: {submitScoreChk = await submitScore(username, password, score)}
+          }
         
           if (submitScoreChk.status == 200) {
             localStorage.setItem("username", username)
