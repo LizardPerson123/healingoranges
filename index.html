@@ -23,7 +23,7 @@
 
       if (localStorage.getItem("beenHere") < 5 || !localStorage.getItem("beenHere")) {
         getById("subtext").id = "what"
-        getById("what").innerText = "About"
+        getById("what").innerText = "Get Pranked, Glorfihemiz"
         getById("what").style.cursor = "pointer"
         getById("what").onclick = () => {window.location.href = 'about.html'}
         localStorage.setItem("beenHere", Number(localStorage.getItem("beenHere") || 0) + 1)
