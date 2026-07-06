@@ -26,9 +26,10 @@
     let currentSectionShowing = "one"
     //Sections Not Put In The Browser's History, But Still Need To Be Unloaded
     let additionalSectionsShowing = []
+    let userEmail
 
-    async function createAccountApi(username, password) {
-      let res = await fetch('https://api.rottingpears.com/createAccount', {method: 'POST', body: JSON.stringify({username: username, password: password}), headers: {"Content-Type": "application/json"}})
+    async function createAccountApi(username, password, email) {
+      let res = await fetch('https://api.rottingpears.com/createAccount', {method: 'POST', body: JSON.stringify({username: username, password: password, email: email}), headers: {"Content-Type": "application/json"}})
       return res.status
     }
 
@@ -51,14 +52,19 @@
     async function makeAccount() {
       let username = getById("username").value
       let password = getById("password").value
+      let email = getById("email").value
 
-      let status = await createAccountApi(username, password)
+      let status = await createAccountApi(username, password, email)
 
       if (status == 200) {
         alert("Account Created")
 
         localStorage.setItem("username", username)
         localStorage.setItem("password", password)
+
+        if (email) {
+          alert("To Verify Your Email Address, An Email Has Been To " + email + " (It May Be In Your Spam Box)")
+        }
         
         history.pushState({}, '', "?origin=one")
         window.location.reload()
@@ -111,7 +117,6 @@
 
       getById('one').style.display = 'none'
       getById('four').style.display = 'flex'
-      historyPush('four')
 
       getById("name").innerText = user.name
       getById("level").innerText = "Level " + user.level
@@ -295,12 +300,273 @@
           case ("four"): {getById("four").style.display = "flex"; yourAccount(); break}
           case ("five"): {keyPressSearch(); break}
           case ("seven"): {getById("seven").style.display = "flex"; seeAccounts(); break}
-          case ("eight"): {getAchievements(undefined, 0, 4, 'achiList')}
+          case ("eight"): {getAchievements(undefined, 0, 4, 'achiList'); break}
+          case ("ten"): {usernameManage(); break}
+          case ("thirteen"): {emailManage(); break}
         }
 
         currentSectionShowing = origin
       }
       else {getById(currentSectionShowing).style.display = "none"; getById("one").style.display = "block"; currentSectionShowing = "one"}
+    }
+
+    function usernameManage() {
+      getById("nine").style.display = "none"
+      getById("ten").style.display = "block"
+      getById("yourUsername").innerHTML = "Your Username: " + localStorage.getItem("username")
+    }
+
+    async function changeUsername() {
+      let oldUsername = localStorage.getItem("username")
+      let newUsername = prompt("Please Enter Your New Username")
+      let password = localStorage.getItem("password")
+
+      let request = await fetch("https://api.rottingpears.com/changeUsername", {
+        method: "POST",
+        body: JSON.stringify({oldUsername: oldUsername, newUsername: newUsername, password: password}),
+        headers: {"content-type": "application/json"}
+      })
+      
+      if (request.status != 200) {
+        switch (await request.text()) {
+          case ("ACCOUNT BANNED"): alert("Your Account Is Banned"); break
+          case ("THAT USER EXISTS"): alert("Somebody Already Has The Username You Chose"); break
+          case ("INCORRECT PASSWORD"): alert("Your Password Is Incorrect"); break
+          case ("INVALID USERNAME"): alert("Your Username Is Too Long"); break
+          case ("USERNAME ALREADY UPDATED"): alert("You Can Only Update Your Username Once Per Day"); break
+          case ("NO USER"): alert("Your Username Does Not Exist"); break
+          default: alert("Something Broke")
+        }
+        return
+      }
+      
+      localStorage.setItem("username", newUsername)
+      alert("Success!")
+      getById("yourUsername").innerHTML = "Your Username: " + newUsername
+    }
+
+    async function passwordManage() {
+      getById("nine").style.display = "none"
+      getById("eleven").style.display = "block"
+
+      let hasEmail = await fetch("https://api.rottingpears.com/changePassword?n=" + encodeURI(localStorage.getItem("username")))
+      hasEmail = await hasEmail.text()
+
+      if (hasEmail == "true") {
+        getById("reset").style.display = "inline"
+      }
+    }
+
+    async function changePassword() {
+      let username = localStorage.getItem("username")
+      let password = prompt("Please Enter Your Current Password")
+      let newPassword = prompt("Please Enter Your New Password")
+
+      let request = await fetch("https://api.rottingpears.com/changePassword", {
+        method: "POST",
+        body: JSON.stringify({username: username, password: password, newPassword: newPassword}),
+        headers: {"content-type": "application/json"}
+      })
+      
+      if (request.status != 200) {
+        switch (await request.text()) {
+          case ("ACCOUNT BANNED"): alert("Your Account Is Banned"); break
+          case ("INCORRECT PASSWORD"): alert("Your Password Is Incorrect"); break
+          case ("NO USER"): alert("That User Does Not Exist"); break
+          case ("PASSWORD ALREADY UPDATED"): alert("You Can Only Update Your Password Once Per Day"); break
+          default: alert("Something Broke")
+        }
+        return
+      }
+
+      alert("Success!")
+      localStorage.setItem("password", newPassword)
+    }
+
+    function deleteManage() {
+      getById("nine").style.display = "none"
+      getById("twelve").style.display = "block"
+      getById("deleteUsername").innerHTML = "Your Username: " + localStorage.getItem("username")
+    }
+
+    async function emailManage() {
+      getById("nine").style.display = "none"
+      getById("thirteen").style.display = "block"
+
+      let user = await getDataApi(localStorage.getItem("username"))
+      getById("yourEmail").innerHTML = "Your Email: " + (user.email || "None")
+      userEmail = user.email
+
+      if (!userEmail) {return}
+
+      getById("unlink").style.display = "inline"
+      getById("change").innerText = "Change"
+      
+      if (user.email_verified) {
+        getById("emailVerified").style.color = "green"
+        getById("emailVerified").innerHTML = "Your Email Is Verified"
+      }
+      else {
+        getById("emailVerified").style.color = "red"
+        getById("emailVerified").innerHTML = "Your Email Is Not Verified"
+        getById("verifyEmail").style.display = "inline"
+      }
+    }
+
+    function deleteOne() {
+      getById("delMsg").innerText = "Are You Sure You Want To Delete Your Account?"
+      getById("delButton").innerText = "Yes, I'm Really Sure"
+      getById("delButton").onclick = deleteTwo
+    }
+
+    function deleteTwo() {
+      getById("delMsg").innerText = "Do You Understand That This Will Permanently Delete Your Account?"
+      getById("delButton").innerText = "Yes, I Understand"
+      getById("delButton").onclick = deleteThree
+    }
+
+    function deleteThree() {
+      let username = localStorage.getItem("username")
+      let usernamePrompt = prompt("Please Enter Your Username")
+      if (usernamePrompt != username) {alert("Incorrect Username"); historyPush("one"); window.location.reload(); return}
+      let code = generateRandomCode(5, 0, 9)
+      let codePrompt = prompt("Please Enter The Following Code: " + code)
+      if (codePrompt != code) {alert("Incorrect Code"); historyPush("one"); window.location.reload(); return}
+      let password = prompt("Please Enter Your Password")
+      let areYouCompletelySure = confirm("Are You 100% Sure You Want To Delete Your Account Forever?")
+      if (areYouCompletelySure) {
+        deleteAccount(password)
+      }
+    }
+
+    async function deleteAccount(password) {
+      let username = localStorage.getItem("username")
+      
+      let request = await fetch("https://api.rottingpears.com/deleteAccount/" + username + "?p=" + password, 
+        {
+          method: "DELETE",
+        }
+      )
+
+      if (request.status != 200) {
+        switch (await request.text()) {
+          case ("ACCOUNT BANNED"): alert("Your Account Is Banned"); break
+          case ("INCORRECT PASSWORD"): alert("Your Password Is Incorrect"); break
+          case ("NO USER"): alert("That User Does Not Exist"); break
+          default: alert("Something Broke")
+        }
+        return
+      }
+      
+      localStorage.removeItem("username")
+      localStorage.removeItem("password")
+      alert("Thank You For Using Rotting Pears")
+      historyPush("one")
+      window.location.reload()
+    }
+
+    async function resetPassword(name) {
+      let request = await fetch("https://api.rottingpears.com/resetSend", {
+        method: "POST",
+        body: JSON.stringify({
+          name: (name || localStorage.getItem("username"))
+        }),
+        headers: {"content-type": "application/json"}
+      })
+      
+      if (request.status != 200) {
+        switch (await request.text()) {
+          case ("CODE ALREADY SENT"): alert("A Code Tied To Your Username Has Already Been Sent"); break
+          case ("PASSWORD ALREADY UPDATED"): alert("You Can Only Update Your Password Once Per Day"); break
+          case ("NO USER"): alert("That User Does Not Exist"); break
+          default: alert("Something Happened")
+        }
+        return
+      }
+
+      alert("An Email Has Been Sent (It May Be In Your Spam Folder)")
+    }
+
+    async function verify() {
+      let request = await fetch("https://api.rottingpears.com/setEmail", {
+        method: "POST",
+        body: JSON.stringify({
+          n: localStorage.getItem("username"),
+          p: localStorage.getItem("password"),
+          e: userEmail,
+        }),
+        headers: {"content-type": "application/json"}
+      })
+
+      if (request.status != 200) {
+        switch (await request.text()) {
+          case ("ACCOUNT BANNED"): alert("Your Account Is Banned"); break
+          case ("INCORRECT PASSWORD"): alert("Your Password Is Incorrect"); break
+          case ("USER HAS EMAIL"): alert("You Already Have A Verified Email"); break
+          case ("CODE ALREADY SENT"): alert("A Code Tied To Your Username Has Already Been Sent"); break
+          default: alert("Something Broke")
+        }
+        return
+      }
+
+      alert("An Email Has Been Sent")
+    }
+
+    async function deleteEmail() {
+      let request = await fetch("https://api.rottingpears.com/email/" + userEmail + "?name=" + localStorage.getItem("username") + "&password=" + localStorage.getItem("password"), {method: "DELETE"})
+
+      if (request.status != 200) {
+        switch (await request.text()) {
+          case ("ACCOUNT BANNED"): alert("Your Account Is Banned"); break
+          case ("INCORRECT PASSWORD"): alert("Your Password Is Incorrect"); break
+          case ("NO USER"): alert("That User Does Not Exist"); break
+          default: alert("Something Broke")
+        }
+        return
+      }
+
+      alert("You Email Has Been Unlinked")
+      window.location.reload()
+    }
+
+    async function changeEmail() {
+      let email = prompt("Enter New Email")
+      let request = await fetch("https://api.rottingpears.com/setEmail", {
+        method: "POST",
+        body: JSON.stringify({
+          n: localStorage.getItem("username"),
+          p: localStorage.getItem("password"),
+          e: email
+        }),
+        headers: {"content-type": "application/json"}
+      }
+      )
+
+      if (request.status != 200) {
+        switch (await request.text()) {
+          case ("ACCOUNT BANNED"): alert("Your Account Is Banned"); break
+          case ("USER HAS EMAIL"): alert("You Already Have That Email"); break
+          case ("CODE ALREADY SENT"): alert("A Code Has Already Been Sent"); break
+          case ("INCORRECT PASSWORD"): alert("Your Password Is Incorrect"); break
+          case ("EMAIL ALREADY UPDATED"): alert("You Can Only Update Your Email Once Per Day"); break
+          case ("NO USER"): alert("That User Does Not Exist"); break
+          default: alert("Something Broke")
+        }
+        return
+      }
+
+      alert("To Verify Your Email Address, A Code Has Been Sent To " + email + " (It May Be In Your Spam Box)")
+      window.location.reload()
+    }
+
+    async function forgotPassword() {
+      let username = prompt("Enter Username")
+      let hasEmail = await fetch("https://api.rottingpears.com/hasEmail?n=" + encodeURI(username))
+      hasEmail = await hasEmail.text()
+
+      if (hasEmail == "false") {alert("We're Sorry, But That User Does Not Have An Email Address To Send A Password Reset To"); return}
+      
+      await resetPassword(username)
     }
 
     window.addEventListener("popstate", manageSwitch)
@@ -334,7 +600,7 @@
       <p style="color: black;">Sign In</p>
     </div>
 
-    <div style="background-color: white; width: 16em;" onclick="yourAccount()" class="option">
+    <div style="background-color: white; width: 16em;" onclick="yourAccount(); historyPush('four')" class="option">
       <img src="images/settings.svg" style="width: 8em; image-rendering: pixelated; margin-bottom: 2em; margin-top: 1em;">
       <p style="color: black;">Your Account</p>
     </div>
@@ -353,7 +619,9 @@
     <input type="text" id="username" name="username" style="width: 60%; border: solid; margin-bottom: 2em; border-radius: 1.5em; font-size: 1.5em; padding-top: 10px; padding-bottom: 10px;"><br>
     <label for="password" style="font-size: 1.5em; margin-bottom: 10px;">Password:</label><br>
     <input type="text" id="password" name="password" style="width: 60%; border: solid; margin-bottom: 2em; border-radius: 1.5em; font-size: 1.5em; padding-top: 10px; padding-bottom: 10px;"><br>
-    
+    <label for="email" style="font-size: 1.5em; margin-bottom: 10px;">Email (Optional):</label><br>
+    <input type="text" id="email" name="email" style="width: 60%; border: solid; margin-bottom: 2em; border-radius: 1.5em; font-size: 1.5em; padding-top: 10px; padding-bottom: 10px;"><br>
+
     <button onclick="makeAccount()" style="background-color: rgb(32, 196, 32);">Make Account</button>
   </div>
 
@@ -366,6 +634,7 @@
     <input type="text" id="password2" name="password" style="width: 60%; border: solid; margin-bottom: 2em; border-radius: 1.5em; font-size: 1.5em; padding-top: 10px; padding-bottom: 10px;"><br>
 
     <button onclick="logIn()" style="background-color: rgb(32, 196, 32);">Sign In</button>
+    <button onclick="forgotPassword()" style="background-color: rgb(32, 196, 32);">Forgot Password?</button>
   </div>
 
   <div id="sidebar" style="position: fixed; height: 100vh; right: 0px; top: 0px; padding-left: 1em; padding-right: 1em; ">
@@ -404,6 +673,7 @@
       <div style="padding-bottom: 2em;">
         <button id="signOut" onclick="signOut()" style="background-color: rgb(32, 196, 32);">Sign Out</button>
         <button style="background-color: rgb(32, 196, 32);" onclick="getById('four').style.display = 'none'; getById('eight').style.display = 'block'; getAchievements(getById('name').innerText, 0, 10, 'achiList'); historyPush('eight', localStorage.getItem('username'));">View Achievements</button>
+        <button style="background-color: rgb(32, 196, 32);" onclick="getById('four').style.display = 'none'; getById('nine').style.display = 'block'; historyPush('nine');">Manage</button>
         <button id="aboutBans" onclick="window.location.href = 'about.html?origin=six'" style="background-color: red; display: none;">About Bans</button>
       </div>
     </div>
@@ -469,6 +739,48 @@
     <button id="back" style="box-shadow: none; background-color: rgb(32, 196, 32); display: none;" onclick="goBackAchi()">Back</button>
     <button style="box-shadow: none; background-color: rgb(32, 196, 32);" onclick="goForwardAchi()">View More</button>
     <button onclick="window.location.href = 'achi.html'" style="margin-bottom: 0px; box-shadow: none; background-color: rgb(32, 196, 32);">View All</button>
+  </div>
+
+  <div id="nine" style="display: none;">
+    <img src="favicon.ico" style="width: 8em; image-rendering: pixelated;">
+    <h1>Account Actions</h1>
+    <button style="margin-bottom: 0px; box-shadow: none; background-color: rgb(32, 196, 32);" onclick="usernameManage(); historyPush('ten')">Username</button>
+    <button style="margin-bottom: 0px; box-shadow: none; background-color: rgb(32, 196, 32);" onclick="passwordManage(); historyPush('eleven')">Password</button>
+    <button style="margin-bottom: 0px; box-shadow: none; background-color: rgb(32, 196, 32);" onclick="emailManage(); historyPush('thirteen')">Email</button>
+    <button style="margin-bottom: 0px; box-shadow: none; background-color:red;" onclick="deleteManage(); historyPush('twelve')">Delete</button>
+  </div>
+
+  <div id="ten" style="display: none;">
+    <img src="favicon.ico" style="width: 8em; image-rendering: pixelated;">
+    <h1>Username</h1>
+    <p id="yourUsername">Your Username: </p>
+    <button style="box-shadow: none; background-color: rgb(32, 196, 32);" onclick="changeUsername()">Change</button>
+  </div>
+
+  <div id="eleven" style="display: none;">
+    <img src="favicon.ico" style="width: 8em; image-rendering: pixelated;">
+    <h1>Password</h1>
+    <button style="box-shadow: none; background-color: rgb(32, 196, 32);" onclick="changePassword()">Change</button>
+    <button style="box-shadow: none; background-color: rgb(32, 196, 32);" onclick="resetPassword()">Reset Password</button>
+  </div>
+
+  <div id="twelve" style="display: none;">
+    <img src="favicon.ico" style="width: 8em; image-rendering: pixelated;">
+    <h1 style="color: red;">Delete Account</h1>
+    <p style="color: red;">Click Below To Delete Your Account</p>
+    <p id="delMsg" style="color: red; font-weight: 900;">IMPORTANT: THIS CANNOT BE UNDONE!</p>
+    <p id="deleteUsername" style="color: red; font-weight: 900;">YOUR ACCOUNT: </p>
+    <button id="delButton" style="box-shadow: none; background-color: red;" onclick="deleteOne()">Delete</button>
+  </div>
+
+  <div id="thirteen" style="display: none;">
+    <img src="favicon.ico" style="width: 8em; image-rendering: pixelated;">
+    <h1>Email</h1>
+    <p id="yourEmail">Your Email: Loading</p>
+    <p id="emailVerified"></p>
+    <button id="change" style="box-shadow: none; background-color: rgb(32, 196, 32);" onclick="changeEmail()">Add</button>
+    <button id="unlink" style="box-shadow: none; background-color: rgb(32, 196, 32); display: none;" onclick="deleteEmail()">Unlink</button>
+    <button id="verifyEmail" style="box-shadow: none; background-color: rgb(32, 196, 32); display: none;" onclick="verify()">Verify</button>
   </div>
   
   <script src='dropdown.js'></script>

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rotting Pears Beta</title>
+  <link rel="stylesheet" href="main.css">
+  <link rel="stylesheet" href="dropdown.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/icon-x" href="favicon.ico">
+
+  <style id="styleTag"></style>
+  <style id="dropdivStyle"></style>
+
+  <script src="utility.js"></script>
+  <script src="index.js"></script>
+
+  <script>
+    async function reset() {
+      let code = getById("code").value
+      let username = getById("name").value
+      let password = getById("password").value
+
+      let request = await fetch("https://api.rottingpears.com/reset", {
+        method: "POST",
+        body: JSON.stringify({
+          code: code,
+          username: username,
+          password: password
+        }),
+        headers: {"content-type": "application/json"}
+      })
+
+      if (request.status == 400) {
+        alert("Invalid Code!")
+      }
+      else if (request.status == 500) {
+        alert("Something Broke")
+      }
+      else {
+        alert("Password Reset! You'll Need To Relogin To Any Devices You Were Signed In To")
+        document.querySelector("body").innerHTML = `
+        <h1 id='go'>You Can Now Leave This Page</h1>
+        `
+
+        setTimeout(() => {getById("go").innerHTML = "No Seriously, You Can Leave"}, 10000)
+        setTimeout(() => {getById("go").innerHTML = "Just Go Away"}, 20000)
+        setTimeout(() => {getById("go").innerHTML = "Do You Think You're Funny?"}, 30000)
+        setTimeout(() => {getById("go").innerHTML = "You're Not"}, 34000)
+        setTimeout(() => {getById("go").innerHTML = "There's No More Text, Go"}, 44000)
+        setTimeout(() => {getById("go").innerHTML = "Ok, Maybe A Bit Of Text"}, 54000)
+        setTimeout(() => {getById("go").innerHTML = "Go Play Rotting Pears Or Minecraft"}, 64000)
+        setTimeout(() => {getById("go").innerHTML = "Don't Just Sit Here"}, 74000)
+        setTimeout(() => {getById("go").innerHTML = "Life Is Finite, Don't Just Sit There"}, 84000)
+        setTimeout(() => {getById("go").innerHTML = "Get A Life"}, 94000)
+        setTimeout(() => {getById("go").innerHTML = "You Know What, I've Had Enough"}, 104000)
+        setTimeout(() => {getById("go").innerHTML = "Goodbye"}, 108000)
+        setTimeout(() => {window.close()}, 111000)
+        setTimeout(() => {getById("go").innerHTML = "You Use Firefox, Right?"}, 113000)
+        setTimeout(() => {getById("go").innerHTML = "I Can't Close The Tab If You're Using Firefox"}, 118000)
+        setTimeout(() => {getById("go").innerHTML = "You Have To Close It Yourself"}, 123000)
+        setTimeout(() => {getById("go").innerHTML = "Be Brave"}, 129000)
+        setTimeout(() => {getById("go").innerHTML = "I Believe In You"}, 137000)
+      }
+    }
+
+
+    window.addEventListener("DOMContentLoaded", function() {
+      const urlParams = new URLSearchParams(window.location.search)
+      const username = urlParams.get('u')
+      const email = urlParams.get('e')
+      getById("emailName").innerHTML = `${email}`
+      getById("username").innerHTML = `${username}`
+    })
+  </script>
+</head>
+<body style="padding-bottom: 20px;">
+  <img src="favicon.ico" style="width: 8em; image-rendering: pixelated;">
+  <h1>Password</h1>
+  <p>Someone (Hopefully You) Sent A Password Reset To Your Email</p>
+  <p>This Will Link <span id="username"></span> To <span id="emailName"></span></p>
+
+  <label for="name" style="font-size: 1.5em; margin-bottom: 10px;">Username</label><br>
+  <input type="text" id="name" name="email" style="width: 60%; border: solid; margin-bottom: 2em; border-radius: 1.5em; font-size: 1.5em; padding-top: 10px; padding-bottom: 10px;"><br>
+
+  <label for="code" style="font-size: 1.5em; margin-bottom: 10px;">Code</label><br>
+  <input type="text" id="code" name="email" style="width: 60%; border: solid; margin-bottom: 2em; border-radius: 1.5em; font-size: 1.5em; padding-top: 10px; padding-bottom: 10px;"><br>
+
+  <label for="password" style="font-size: 1.5em; margin-bottom: 10px;">New Password</label><br>
+  <input type="text" id="password" name="email" style="width: 60%; border: solid; margin-bottom: 2em; border-radius: 1.5em; font-size: 1.5em; padding-top: 10px; padding-bottom: 10px;"><br>
+  <button onclick="reset()" style="background-color: rgb(32, 196, 32);">Reset</button>
+  
+  <div id="dropdiv" style="position: absolute; top: 0px; left: 10px;">
+    <div class="dropdown">
+    <button class="dropbtn" id="dropText">Options</button>
+      <div class="dropdown-content">
+        <a href="javascript:toggleMode()">Mode</a>
+        <a href="settings.html">Accounts</a>
+        <a href="about.html">About</a>
+      </div>
+    </div>
+  </div>
+  
+  <div id="sidebar" style="position: fixed; height: 100vh; right: 0px; top: 0px; padding-left: 1em; padding-right: 1em;">
+    <div style="display: flex; flex-direction: column; justify-content: center; text-align: center; align-items: center; cursor: pointer; margin-top: 20px;" onclick="window.location.href = 'index.html';" class="sidebarOp">
+      <img src="images/house.svg" style="width: 100%; image-rendering: pixelated;">
+      <p style="font-size: 200%;">Home</p>
+    </div>
+
+    <div style="display: flex; flex-direction: column; justify-content: center; text-align: center; align-items: center; cursor: pointer;" onclick="window.location.href = 'settings.html';" class="sidebarOp">
+      <img src="images/account.svg" style="width: 100%; image-rendering: pixelated;">
+      <p style="font-size: 200%;">Accounts</p>
+    </div>
+
+    <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer;" class="sidebarOp">
+      <img src="images/moon.svg" style="width: 100%; image-rendering: pixelated;" id="imgMode" onclick="toggleMode()">
+      <p style="font-size: 200%;">Mode</p>
+    </div>
+  </div>
+  
+  <script src="main.js"></script>
+  <script src='dropdown.js'></script>
+  <script src='utility.js'></script>
+</body>
+</html>
