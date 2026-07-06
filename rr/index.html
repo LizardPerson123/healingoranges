@@ -90,6 +90,12 @@
           players.push(new Human("Person " + i))
         }
       }
+      else if (gameMode == "5players") {
+        players.push(new Bot("CPU 1"))
+        players.push(new Bot("CPU 2"))
+        players.push(new Bot("CPU 3"))
+        players.push(new Bot("CPU 4"))
+      }
       else {
         players.push(new Bot("CPU 1"))
         players.push(new Bot("CPU 2"))
@@ -113,10 +119,10 @@
       }
       else {await firstAlcoholSingleplayer()}
 
-      let i = 0
+      let turns = 0
 
       while (true) {
-        i++
+        turns++
         // For Achievement
         let numberOfPeopleWithOneHeart = 0
         players.forEach(function(player) {
@@ -159,6 +165,18 @@
             }
             continue
           }
+
+          let playersAlive = 0
+          players.forEach(function(player) {
+            if (player.hp > 0) {
+              playersAlive++
+            }
+          })
+
+          if (playersAlive == players.length - 1 && gameMode == "survival") {
+            alert("You Survived " + turns + " Turns")
+            reload()
+          }
        
           if (players[0].hp == 0) {
             let allUsed = checkIfAllAlcoholUsed()
@@ -192,7 +210,7 @@
             reload()
           }
 
-          else if (players[1].hp == 0 && players[2].hp == 0) {
+          else if (playersAlive == 1) {
             alert("You Win")
             achi.laterRegi("Win Rotting Roulette", "bronze")
 
@@ -512,7 +530,7 @@
     </div>
 
     <div style="grid-area: 1/5/5/5; display: none; position: relative;" id="messages">
-      <div id="messageDiv" style="overflow: scroll;">
+      <div id="messageDiv" style="overflow: scroll; height: 70%;">
         <h1>Players</h1>
 
         <p><span style="color: gray;">Example</span> Hello World!</p>
@@ -540,11 +558,13 @@
 
    <div id="buttonSet2" style="display: none;">
      <button style="justify-items: center; border: solid; width: 10em; font-size: 2em; font-family: cursive; background-color: rgba(0, 0, 0, 0.0); margin-bottom: 8px; display: block;" onclick="startGame()" class="startGameButton">Normal Mode</button>
-     <button style="justify-items: center; border: solid; width: 10em; font-size: 2em; font-family: cursive; background-color: rgba(0, 0, 0, 0.0); color: #FF073A; margin-top: 0px; margin-bottom: 8px;" onclick="gameMode = 'insane'; startGame()" class="startGameButton">Insane Mode</button>
+     <button style="justify-items: center; border: solid; width: 10em; font-size: 2em; font-family: cursive; background-color: rgba(0, 0, 0, 0.0); color: #FF073A; margin-top: 0px; margin-bottom: 8px; display: block;" onclick="gameMode = 'insane'; startGame()" class="startGameButton">Insane Mode</button>
+     <button id="5p" style="justify-items: center; border: solid; width: 10em; font-size: 2em; font-family: cursive; background-color: rgba(0, 0, 0, 0.0); margin-top: 0px; margin-bottom: 8px; display: block; color: blue;" onclick="gameMode = '5players'; startGame()" class="startGameButton">5 Players</button>
+     <button style="justify-items: center; border: solid; width: 10em; font-size: 2em; font-family: cursive; background-color: rgba(0, 0, 0, 0.0); margin-top: 0px; margin-bottom: 8px; display: block; color: orange;" onclick="gameMode = 'survival'; startGame()" class="startGameButton">Survival</button>
    </div>
 
    <div id="buttonSet3" style="display: none;">
-     <button style="justify-items: center; border: solid; width: 10em; font-size: 2em; font-family: cursive; background-color: rgba(0, 0, 0, 0.0); margin-bottom: 8px; display: block;" onclick="getById('buttonSet3').style.display = 'none'; getById('buttonSet2').style.display = 'block'; localMultiplayer = true" class="startGameButton">Local</button>
+     <button style="justify-items: center; border: solid; width: 10em; font-size: 2em; font-family: cursive; background-color: rgba(0, 0, 0, 0.0); margin-bottom: 8px; display: block;" onclick="getById('buttonSet3').style.display = 'none'; getById('buttonSet2').style.display = 'block'; getById('5p').style.display = 'none'; localMultiplayer = true" class="startGameButton">Local</button>
      <button style="justify-items: center; border: solid; width: 10em; font-size: 2em; font-family: cursive; background-color: rgba(0, 0, 0, 0.0); margin-top: 0px; margin-bottom: 8px;" onclick="multiplayer()" class="startGameButton">Online</button>
    </div>
 
@@ -583,6 +603,12 @@
 
     <h2 style="margin-top: 3em;">Insane Mode</h2>
     <p style="font-size: 1.5em; margin-bottom: 5px;">In Insane Mode, Every Bullet Has A 50/50 Chance Of Being Live Or Alcohol</p>
+
+    <h2 style="margin-top: 3em;">5 Players</h2>
+    <p style="font-size: 1.5em; margin-bottom: 5px;">In 5 Players, There Are 5 Players (You And 4 CPUs)</p>
+
+    <h2 style="margin-top: 3em;">Survival</h2>
+    <p style="font-size: 1.5em; margin-bottom: 5px;">In Survival, You Have To Go As Long As Possible Without Anyone Dying</p>
   </div>
 
   <div id="multiplayerMenu" style="display: none; flex-direction: column; width: 100%; align-items: center;">
@@ -606,9 +632,10 @@
   <div style="display: none;" id="multiplayerNewMenu">
     <h1>Multiplayer</h1>
     <h2 id="status"></h2>
-    <button style="margin-bottom: 20px; display: none;" class="playerOption" onclick="getById('beginGameButton').style.display = 'none'; getById('multiplayerButton2').style.display = 'inline-block'; getById('multiplayerButton3').style.display = 'inline-block'" id="beginGameButton">Start Game</button>
+    <button style="margin-bottom: 20px; display: none;" class="playerOption" onclick="getById('beginGameButton').style.display = 'none'; getById('multiplayerButton2').style.display = 'inline-block'; getById('multiplayerButton3').style.display = 'inline-block'; getById('multiplayerButton4').style.display = 'inline-block'" id="beginGameButton">Start Game</button>
     <button style="margin-bottom: 20px; display: none;" class="playerOption" onclick="beginGameHost()" id="multiplayerButton2">Normal Mode</button>
     <button style="margin-bottom: 20px; display: none; color: rgb(255, 0, 0);" class="playerOption" onclick="gameMode = 'insane'; beginGameHost()" id="multiplayerButton3">Insane Mode</button>
+    <button style="margin-bottom: 20px; display: none; color: orange;" class="playerOption" onclick="gameMode = 'survival'; beginGameHost()" id="multiplayerButton4">Survival</button>
     <div style="padding-top: 0.5em; padding-bottom: 1em; border: solid;" id="usernames">
       <h2 style="font-size: 1.7em;">Players</h2>
     </div>
