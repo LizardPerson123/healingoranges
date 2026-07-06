@@ -11,7 +11,7 @@
   <style id="styleTag"></style>
 
   <script>
-    console.log("Version 2.00")
+    console.log("Version 2.1.0")
 
     let playerCards
     let cpuCards
@@ -21,6 +21,13 @@
     let biasNum
     let lastResult = "none"
     let streak = 0
+    let gamemode = "normal"
+    let difficulty = 1
+    let timeout
+    let timeToTake = 1000
+    let hasSpedUp = false
+    let skillWonEveryTime = true
+    let roundNum = 0
 
     function showCard(card, id) {
       getById(id).innerHTML += `<img width="100%" src='../cards/${card[0]}-${card[1]}.svg' >`
@@ -66,12 +73,59 @@
       getById("cpuCardsNum").style.display = "block"
       getById("whoWon").style.display = "block"
 
+      switch (difficulty) {
+        case (0): timeToTake = 1400; break
+        case (1): timeToTake = 1200; break
+        case (2): timeToTake = 900; break
+      }
+
+      if (gamemode == "skill") {
+        resetCards()
+        let start = startGame(playerCards, cpuCards, 52)
+        playerCards = start[0]
+        cpuCards = start[1]
+        getById("thisRound").style.display = "block"
+      }
+
       round()
     }
 
-    function round() {
+    async function round() {
+      if (roundNum >= 50 && cpuCards.length < 1 && gamemode == "skill") {
+        alert("You Have To Get All The Cards In Under 60 Turns To Win, It Took You " + roundNum + " Turns")
+        playerCards.length = 0
+        cpuCards = [" "]
+      }
+
       if (!cpuCards[0]) {
         alert("You Win!")
+        
+        if (gamemode == "skill") {
+          achi.laterRegi("Win War In Skill Mode", "silver")
+          if (skillWonEveryTime) {
+            achi.laterRegi("Get A Life", "gold")
+            alert("Rank: S")
+          }
+          else if (roundNum >= 50) {
+            alert("Rank: E")
+          }
+          else if (roundNum >= 40) {
+            alert("Rank: D")
+          }
+          else if (roundNum >= 35 ) {
+            alert("Rank: C")
+          }
+          else if (roundNum >= 30) {
+            alert("Rank: B")
+          }
+          else {
+            alert("Rank: A")
+          }
+
+          handleEnd(true)
+          return
+        }
+
         achi.laterRegi("Win The Game (War)", "silver")
 
         let gameWinCount = Number(localStorage.getItem("gameWinCount")) || 0
@@ -86,10 +140,16 @@
       }
       else if (!playerCards[0]) {
         alert("CPU Wins")
+        if (gamemode == "skill") {
+          handleEnd(false)
+          return
+        }
         localStorage.setItem("gameWinCount", 0)
         achi.laterRegi("Lose A Game Of War", "bronze")
         handleEnd(false)
       }
+
+      let compareResult = await compare(playerCards[0][1], cpuCards[0][1])
 
       hideCard("playerCards")
       hideCard("cpuCards")
@@ -98,8 +158,6 @@
       preLoadCard(cpuCards[1])
       showCard(playerCards[0], "playerCards")
       preLoadCard(playerCards[1])
-
-      let compareResult = compare(playerCards[0][1], cpuCards[0][1])
       
       if (compareResult == "war") {
         getById("whoWon").innerHTML = "War!"
@@ -148,13 +206,12 @@
         }
 
         getById("round").setAttribute("onclick", "warRound()")
-
       }
 
       else if (compareResult) {
         getById("whoWon").innerHTML = "Player Wins Card"
 
-        if (lastResult == "player") {
+        if (lastResult == "player" && gamemode == "normal") {
           streak++
           getById("whoWon").innerHTML += " x" + streak
 
@@ -176,7 +233,7 @@
       else {
         getById("whoWon").innerHTML = "CPU Wins Card"
 
-        if (lastResult == "dealer") {
+        if (lastResult == "dealer" && gamemode == "normal") {
           streak++
           getById("whoWon").innerHTML += " x" + streak
         }
@@ -193,6 +250,12 @@
       getById("cpuCardsNum").innerHTML = `CPU Cards: ${cpuCards.length}`
 
       i++
+
+      if (gamemode == "skill") {
+        if (!compareResult) {
+          skillWonEveryTime = false
+        }
+      }
     }
 
     function warRound() {
@@ -255,6 +318,68 @@
     }
 
     function compare(playerCard, cpuCard) {
+      if (gamemode == "skill") {
+        return new Promise(function(resolve, reject) {
+          //this code sux
+          getById("thisRound").innerText = "This Round: " + ++roundNum
+          getById("round").style.display = "none"
+
+          let correctButton = getRndInteger(1, 4)
+          let chosenAction = getRndInteger(1, 9)
+
+          if (chosenAction == 1 || chosenAction == 2) {
+            getById("choice4").style.display = "inline"
+            getById("choice5").style.display = "inline"
+            getById("choice6").style.display = "inline"
+            getById("choice4").onclick = function() {resetChoiceButtons(); resolve(false)}
+            getById("choice5").onclick = function() {resetChoiceButtons(); resolve(false)}
+            getById("choice6").onclick = function() {resetChoiceButtons(); resolve(false)}
+            let colorChoices = ["Red", "Blue", "Green"]
+            correctButton = getRndInteger(0, colorChoices.length)
+            getById("whoWon").innerText = "Click The " + colorChoices[correctButton] + " Button"
+            correctButton += 4
+          }
+          else {
+            getById("choice1").style.display = "inline"
+            getById("choice2").style.display = "inline"
+            getById("choice3").style.display = "inline"
+            getById("choice1").onclick = function() {resetChoiceButtons(); resolve(false)}
+            getById("choice2").onclick = function() {resetChoiceButtons(); resolve(false)}
+            getById("choice3").onclick = function() {resetChoiceButtons(); resolve(false)}
+            getById("whoWon").innerText = "Click Button " + correctButton
+
+            if (chosenAction == 5 || chosenAction == 6 || chosenAction == 8) {
+              let words = ["Ebola Words", "Blackjack", "War", "Slapjack", "Pears", "Rotting"]
+
+              for (let i = 1; i < 4; i++) {
+                let chosenWord = words[getRndInteger(0, words.length)]
+                getById("choice" + i).innerHTML = chosenWord
+                removeItem(words, chosenWord)
+              }
+
+              getById("whoWon").innerHTML = "Click " + getById("choice" + correctButton).innerText
+            }
+
+            else if (chosenAction == 7) {
+              getById("whoWon").innerHTML = "Do Nothing"
+              timeout = setTimeout(function() {
+                resetChoiceButtons()
+                resolve(true)
+                speedUpGame()
+              }, 1000)
+              return
+            }
+          }
+
+          getById("choice" + correctButton).onclick = function() {resetChoiceButtons(); resolve(true); speedUpGame()}
+
+          timeout = setTimeout(function() {
+            resetChoiceButtons()
+            resolve(false)
+          }, timeToTake)
+        })
+      }
+
       if (playerCard == 1) {
         playerCard = 14
       }
@@ -344,6 +469,49 @@
       window.location.reload()
     }
 
+    function chooseMode() {
+      getById("single").style.display = "none"
+      getById("multi").style.display = "none"
+      getById("about").style.display = "none"
+      getById("normalMode").style.display = "inline"
+      getById("skillMode").style.display = "inline"
+    }
+
+    function resetChoiceButtons() {
+      getById("choice1").style.display = "none"
+      getById("choice2").style.display = "none"
+      getById("choice3").style.display = "none"
+      getById("choice4").style.display = "none"
+      getById("choice5").style.display = "none"
+      getById("choice6").style.display = "none"
+      getById("choice1").innerHTML = "Button"
+      getById("choice2").innerHTML = "Button"
+      getById("choice3").innerHTML = "Button"
+      getById("round").style.display = "inline"
+      
+      clearTimeout(timeout)
+    }
+
+    function speedUpGame() {
+      if (playerCards.length >= 39 && !hasSpedUp) {
+        alert("The Game Is Speeding Up!")
+        hasSpedUp = true
+        switch (difficulty) {
+          case (0): timeToTake = 1200; break
+          case (1): timeToTake = 1000; break
+          case (2): timeToTake = 800; break
+        }
+      }
+    }
+
+    function chooseDifficulty() {
+      getById("normalMode").style.display = "none"
+      getById("skillMode").style.display = "none"
+      getById("easyDiff").style.display = "inline"
+      getById("normalDiff").style.display = "inline"
+      getById("hardDiff").style.display = "inline"
+    }
+
   </script>
 </head>
 <body>
@@ -383,27 +551,59 @@
   <h1 id="iHaveACrushOn" style="margin-top: 0em; margin-bottom: 10px;">War</h1>
   <img id="imgMode" src="../sun.svg" style="position: absolute; right: 10px; top: 0px; width: 100px;" onclick="changeMode();">
   <div style="object-fit: cover; display: flex; justify-content: center; align-items: center; gap: 10px; flex-wrap: wrap;" id="options">
-    <div style="position: relative; text-align: center;">
-      <img style="image-rendering: pixelated;" onclick="firstRound()" class="gameOptionCards" src="../playingcardback.png">
+    <div id="single" style="position: relative; text-align: center;">
+      <img style="image-rendering: pixelated;" onclick="chooseMode()" class="gameOptionCards" src="../playingcardback.png">
       <h3 style="font-size: 2.5em; color: black; " class="centerText">Singleplayer</h3>
     </div>
 
-    <div style="position: relative; text-align: center;">
+    <div id="multi" style="position: relative; text-align: center;">
       <img style="image-rendering: pixelated;" onclick="multiplayerStart()" class="gameOptionCards" src="../playingcardback.png">
-      <h3 style="font-size: 2.5em; color: black; " class="centerText" >Multiplayer</h3>
+      <h3 style="font-size: 2.5em; color: black; " class="centerText">Multiplayer</h3>
     </div>
 
-    <div style="position: relative; text-align: center;">
+    <div id="about" style="position: relative; text-align: center;">
       <img style="image-rendering: pixelated;" onclick="window.location.href = 'howtoplay.html'" class="gameOptionCards" src="../playingcardback.png">
-      <h3 style="font-size: 2.5em; color: black; " class="centerText" >How To Play</h3>
+      <h3 style="font-size: 2.5em; color: black; " class="centerText">How To Play</h3>
+    </div>
+
+    <div id="normalMode" style="position: relative; text-align: center; display: none;">
+      <img style="image-rendering: pixelated;" onclick="firstRound()" class="gameOptionCards" src="../playingcardback.png">
+      <h3 style="font-size: 2.5em; color: black; " class="centerText">Normal Mode</h3>
+    </div>
+
+    <div id="skillMode" style="position: relative; text-align: center; display: none;">
+      <img style="image-rendering: pixelated;" onclick="gamemode = 'skill'; chooseDifficulty()" class="gameOptionCards" src="../playingcardback.png">
+      <h3 style="font-size: 2.5em; color: black; " class="centerText">Skill Mode</h3>
+    </div>
+
+    <div id="easyDiff" style="position: relative; text-align: center; display: none;">
+      <img style="image-rendering: pixelated;" onclick="difficulty = 0; firstRound()" class="gameOptionCards" src="../playingcardback.png">
+      <h3 style="font-size: 2.5em; color: black; " class="centerText">Easy</h3>
+    </div>
+
+    <div id="normalDiff" style="position: relative; text-align: center; display: none;">
+      <img style="image-rendering: pixelated;" onclick="difficulty = 1; firstRound()" class="gameOptionCards" src="../playingcardback.png">
+      <h3 style="font-size: 2.5em; color: black; " class="centerText">Normal</h3>
+    </div>
+
+    <div id="hardDiff" style="position: relative; text-align: center; display: none;">
+      <img style="image-rendering: pixelated;" onclick="difficulty = 2; firstRound()" class="gameOptionCards" src="../playingcardback.png">
+      <h3 style="font-size: 2.5em; color: black; " class="centerText">Hard</h3>
     </div>
   </div>
 
   <button style="display: none;" id="round" onclick="firstRound()" class="optionButton">Start</button>
+  <button style="display: none;" id="choice1" class="optionButton">Button</button>
+  <button style="display: none;" id="choice2" class="optionButton">Button</button>
+  <button style="display: none;" id="choice3" class="optionButton">Button</button>
+  <button style="display: none; background-color: red !important;" id="choice4" class="optionButton">Button</button>
+  <button style="display: none; background-color: blue !important;" id="choice5" class="optionButton">Button</button>
+  <button style="display: none; background-color: green !important;" id="choice6" class="optionButton">Button</button>
   <button id="chatButton" style="display: none;" class="optionButton" onclick="chat.show()">Chat</button>
   
   <h1 id="host" style="display: none;"></h1>
   <h1 id="whoWon" style="display: none;">Click Start Or Multiplayer</h1>
+  <p id="thisRound" class="infoText" style="display: none;">Round: </p>
   <p id="cpuCardsNum" class="infoText" style="display: none;">CPU Cards: </p>
   <p id="playerCardsNum" class="infoText" style="display: none;">Your Cards: </p>
 
