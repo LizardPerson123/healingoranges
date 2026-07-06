@@ -3,8 +3,8 @@ let whiskeyResolveFunc
 
 function joinSession(username, password, sessionID) {
   return new Promise(async function (resolve, reject) {
-    getById("multiplayerMenu").style.display = "none";
-    getById("multiplayerJoin").style.display = "block";  
+    getById("multiplayerMenu").style.display = "none"
+    getById("multiplayerJoin").style.display = "block"
 
     try {
       let [hostName, usersList, assume] = await joinSessionApi(username, password, sessionID)

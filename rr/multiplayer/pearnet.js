@@ -154,7 +154,7 @@ function beginMultiplayer() {
         
         case "SESSION ENDED":
           alert("Session Ended")
-          window.location.reload()
+          reload()
         
         case "USER LEFT":
           await onUserLeft(eventData)

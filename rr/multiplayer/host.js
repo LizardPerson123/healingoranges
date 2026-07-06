@@ -7,8 +7,8 @@ let inGame = false
 
 function newSession(username, password) {
   return new Promise(async function (resolve, reject) {
-    getById("multiplayerMenu").style.display = "none";  
-    getById("multiplayerNewMenu").style.display = "block";  
+    getById("multiplayerMenu").style.display = "none"
+    getById("multiplayerNewMenu").style.display = "block"
 
     try {
       let sessionID = await newSessionApi(username, password)
@@ -80,7 +80,7 @@ function newSession(username, password) {
   })
 }
 
-async function beginGameHost() {
+async function beginGameHost(turns) {
   achi.register("Play Rotting Roulette Multiplayer", "bronze")
   getById("showMsgButton").style.display = "block"
   keyPressSendMessage()
@@ -162,6 +162,11 @@ async function beginGameHost() {
       multiplayerGame()
     }
   }
+  
+  //To Prevent Bugs, This Has To Show After The Broadcast Message To Restart Is Shown
+  if (turns) {
+    alert("You Survived " + turns + " Turns")
+  }
 
   await firstAlcoholHost()
   getById("firstAlcohol").style.display = "none"
@@ -189,11 +194,17 @@ async function multiplayerGame() {
     }))
 
     bulletList.generateNew(100)
-
+    
+    let turns = 0
     while (true) {
+      turns++
       for (let i = 0; i < players.length; i++) {
         if (players[i].hp < 1) {
           continue
+        }
+        else if (players.getAlivePlayers().length < players.length && gameMode == "survival") {
+          resetGame(true, turns)
+          return
         }
         else if (players.getAlivePlayers().length == 1) {
           resetGame()
@@ -243,7 +254,7 @@ function endGamePhase() {
   }
 }
 
-function resetGame(isHost = true) {
+function resetGame(isHost = true, turns) {
   currentPlayer = undefined
   takenAlcoholFrom = []
   gameAlcohol = []
@@ -279,6 +290,6 @@ function resetGame(isHost = true) {
   players.length = 0
   
   if (isHost) {
-    beginGameHost()
+    beginGameHost(turns)
   }
 }
