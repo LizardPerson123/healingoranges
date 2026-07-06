@@ -133,7 +133,6 @@ async function beginRound() {
   getById("multiplayerNewMenu").innerHTML = "<h1>Waiting For Other Players</h1>"
 
   onMessageFrom = async function(event) {
-    alert("ZAAAAAAAA")
     let eventData = JSON.parse(event.data)
     let from = eventData.from
     eventData = JSON.parse(eventData.content)
