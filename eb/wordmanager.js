@@ -232,10 +232,9 @@ async function beginTimeAttack() {
   let pauseTime = false
   let level = 1
 
-  getById("highscore").style.display = "none"
   getById("time").style.display = "block"
 
-  setInterval(function() {if (pauseTime) {return}; time--; getById("time").innerHTML = "Time Left: " + time; if (time < 1) {alert("Game Over"); window.location.reload()}}, 1000)
+  let interval = setInterval(function() {if (pauseTime) {return}; time--; getById("time").innerHTML = "Time Left: " + time; if (time < 1) {manageGameFinished(score); clearInterval(interval)}}, 1000)
   
   async function b() {
     while (idList.length < length) {

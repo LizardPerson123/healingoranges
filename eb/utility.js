@@ -22,6 +22,7 @@ async function manageGameFinished(score) {
     getById("highscore").style.display = "none"
     getById("ebolaCanvas").style.display = "none"
     getById("submitScore").style.display = "block"
+    getById("time").style.display = "none"
 
     alert("Game Over! Your Score: " + score)
 
