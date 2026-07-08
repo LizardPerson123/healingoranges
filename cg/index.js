@@ -1,6 +1,5 @@
 function letThereBeLight() {
   getById("styleTag").innerHTML = ""
-  localStorage.setItem("mode", "light")
   getById("imgMode").src = "../moon.svg"
 }
 
@@ -19,8 +18,6 @@ function letThereBeDark() {
       color: black !important;
     }
   `
-
-  localStorage.setItem("mode", "dark")
 
   getById("imgMode").src = "../sun.svg"
 }
@@ -41,14 +38,15 @@ function changeMode() {
 
   if (currentMode == "light") {
     letThereBeDark()
+    localStorage.setItem("mode", "dark")
   }
   else {
     letThereBeLight()
+    localStorage.setItem("mode", "light")
   }
 }
 
 addEventListener("pageshow", function() {
-  applyMode()
   try {
     const urlParams = new URLSearchParams(window.location.search)
     const origin = urlParams.get('origin')
@@ -62,3 +60,9 @@ addEventListener("pageshow", function() {
   }
   catch(err) {}
 })
+
+addEventListener("pageshow", function() {
+  applyMode()
+})
+
+applyMode()
