@@ -177,3 +177,13 @@ let achi = new RottingExtension({
     }
   }
 })
+
+let warExclusiveSkilLMode = new RottingExtension({
+  name: "skillModeAbout",
+  show: function() {RottingExtension.setCurrentView(this.name)},
+})
+
+let warExclusiveAllChallenges = new RottingExtension({
+  name: "challenges",
+  show: function() {RottingExtension.setCurrentView(this.name)},
+})
