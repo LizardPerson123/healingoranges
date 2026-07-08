@@ -7,6 +7,8 @@
   <link rel="stylesheet" href="blackjack.css">
   <link rel="stylesheet" href="../general.css">
   <style id="styleTag"></style>
+  <script src="../utility.js"></script>
+  <script src="../index.js"></script>
   <link rel="icon" type="image/icon-x" href="favicon.ico">
 
   <script>
@@ -131,7 +133,7 @@
 
       let won = false
 
-      if (playerNumber > dealerNumber || dealerNumber > 21 || playerNumber == dealerNumber) {
+      if (playerNumber > dealerNumber || dealerNumber > 21) {
         alert("You win! Dealer had " + dealerNumber)
         won = true
         if (betAmount >= 10 && localStorage.getItem("bljScore") == betAmount) {achi.laterRegi("Bet It All And Win (10+)", "silver")}
@@ -314,7 +316,7 @@
   <div id="outer" style="display: none; grid-template-columns: auto auto auto; grid-template-rows: auto auto auto; justify-content: center; align-items: center; margin-top: 2em; position: relative;">
   
   <div id="outerCards" style="grid-area: 2 / 2 / span 1 / span 1; display: inline-flex; justify-content: center; align-items: center; background:none; background-image: url('table.png'); image-rendering: pixelated; box-shadow: none; border-radius: 30px; gap: 20px; background-size: 100% 100%; position: relative;" class="outerBoxDiv">
-    <button id="switchDealerPlayer" onclick="switchFunc()" style="position: absolute; top: 10px; left: 10px; border: none; font-size: 1.5em; padding: 3px; color: black;">Switch to Dealer</button>
+    <button id="switchDealerPlayer" onclick="switchFunc()" style="position: absolute; top: 10px; left: 10px; border: none; font-size: 1.5em; padding: 3px;">Switch to Dealer</button>
     <div style="display: flex; flex-direction: column; justify-content: center; width: 90%; height: inherit;" id="outerPlayer">
       <div id="playerCards" class="cardDeck" style="display: flex; align-items: center; height: inherit;">
       </div>
@@ -372,8 +374,8 @@
     
     <div id="continueButtons">
       <h1>Continue?</h1>
-      <button style="border: solid; background-color: rgb(3, 212, 55) !important; font-size: 3em; width: 2em;" onclick="resolveShouldContinue(true)">Yes</button>
-      <button style="border: solid; background-color: rgb(212, 3, 3) !important; font-size: 3em; width: 2em;" onclick="resolveShouldContinue(false)">No</button>
+      <button class="optionButton" style="background-color: rgb(3, 212, 55) !important;" onclick="resolveShouldContinue(true)">Yes</button>
+      <button class="optionButton" style="background-color: rgb(212, 3, 3) !important;" onclick="resolveShouldContinue(false)">No</button>
     </div>
   </div>
   </div>
@@ -381,9 +383,7 @@
   <script src="../pearnet.js"></script>
   <script src="clientlib.js"></script>
   <script src="multiplayer.js"></script>
-  <script src="../utility.js"></script>
   <script src="../generatecard.js"></script>
-  <script src="../index.js"></script>
   <script src="../rotextensions.js"></script>
 
   <script>
