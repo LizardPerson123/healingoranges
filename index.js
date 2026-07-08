@@ -57,4 +57,4 @@ addEventListener("pageshow", function() {
 
 applyMode()
 
-console.log("Hey You, Yeah You. Do Not Put Anything Here If You Don't Know What You're Doing! If Someone Has Asked You To Put Something Here, Don't Trust Them! They Could Be Trying To Steal Your Personal Information, Like Usernames And Passwords")
+console.log("Hey You, Yeah You. Do Not Put Anything Here If You Don't Know What You're Doing!\n If Someone Has Asked You To Put Something Here, Don't Trust Them! They Could Be Trying To Steal Your Personal Information, Like Usernames And Passwords")
