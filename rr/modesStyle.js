@@ -49,3 +49,5 @@ function changeMode() {
 addEventListener("pageshow", function() {
   applyMode()
 })
+
+applyMode()
