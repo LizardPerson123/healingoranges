@@ -7,8 +7,9 @@
   <link rel="stylesheet" href="war.css">
   <link rel="stylesheet" href="../general.css">
   <link rel="icon" type="image/icon-x" href="favicon.ico">
-
   <style id="styleTag"></style>
+  <script src="../utility.js"></script>
+  <script src="../index.js"></script>
 
   <script>
     console.log("Version 2.1.0")
@@ -28,6 +29,7 @@
     let hasSpedUp = false
     let skillWonEveryTime = true
     let roundNum = 0
+    let hasSpedUpAgain = false
 
     function showCard(card, id) {
       getById(id).innerHTML += `<img width="100%" src='../cards/${card[0]}-${card[1]}.svg' >`
@@ -74,9 +76,9 @@
       getById("whoWon").style.display = "block"
 
       switch (difficulty) {
-        case (0): timeToTake = 1400; break
-        case (1): timeToTake = 1200; break
-        case (2): timeToTake = 900; break
+        case (0): timeToTake = 1300; break
+        case (1): timeToTake = 1100; break
+        case (2): timeToTake = 800; break
       }
 
       if (gamemode == "skill") {
@@ -90,8 +92,20 @@
       round()
     }
 
+    function checkIfPlayedSkillMode() {
+      let hasPlayedSkillMode = localStorage.getItem("firstTimeSkill")
+
+      if (!hasPlayedSkillMode) {
+        localStorage.setItem("firstTimeSkill", true)
+        warExclusiveSkilLMode.show()
+      }
+      else {
+        firstRound()
+      }
+    }
+
     async function round() {
-      if (roundNum >= 50 && cpuCards.length < 1 && gamemode == "skill") {
+      if (roundNum >= 60 && cpuCards.length < 1 && gamemode == "skill") {
         alert("You Have To Get All The Cards In Under 60 Turns To Win, It Took You " + roundNum + " Turns")
         playerCards.length = 0
         cpuCards = [" "]
@@ -184,10 +198,6 @@
 
             showCard(playerCard, "playerCards")
           }
-          else {
-            
-          }
-          
         }
 
         for (let i = 1; i <= 3; i++) {
@@ -325,7 +335,7 @@
           getById("round").style.display = "none"
 
           let correctButton = getRndInteger(1, 4)
-          let chosenAction = getRndInteger(1, 9)
+          let chosenAction = getRndInteger(1, 18)
 
           if (chosenAction == 1 || chosenAction == 2) {
             getById("choice4").style.display = "inline"
@@ -349,7 +359,7 @@
             getById("whoWon").innerText = "Click Button " + correctButton
 
             if (chosenAction == 5 || chosenAction == 6 || chosenAction == 8) {
-              let words = ["Ebola Words", "Blackjack", "War", "Slapjack", "Pears", "Rotting"]
+              let words = ["Ebola", "Blackjack", "War", "Slapjack", "Pears", "Rotting"]
 
               for (let i = 1; i < 4; i++) {
                 let chosenWord = words[getRndInteger(0, words.length)]
@@ -368,6 +378,45 @@
                 speedUpGame()
               }, 1000)
               return
+            }
+
+            else if (chosenAction == 9) {
+              getById("whoWon").innerHTML = "Click Any Button"
+              getById("choice1").onclick = function() {resetChoiceButtons(); resolve(true); speedUpGame()}
+              getById("choice2").onclick = function() {resetChoiceButtons(); resolve(true); speedUpGame()}
+              getById("choice3").onclick = function() {resetChoiceButtons(); resolve(true); speedUpGame()}
+            }
+            
+            else if (chosenAction == 10 || chosenAction == 11) {
+              getById("whoWon").innerHTML = "Click The Least Visible Button"
+              getById("choice1").style.opacity = 0.6
+              getById("choice2").style.opacity = 0.8
+              getById("choice3").style.opacity = 0.5
+              getById("choice" + correctButton).style.opacity = 0.2
+            }
+
+            else if (chosenAction == 12 || chosenAction == 13) {
+              getById("whoWon").innerHTML = "Click The Smallest Button"
+              getById("choice1").style.fontSize = "1.5em"
+              getById("choice2").style.fontSize = "1.2em"
+              getById("choice3").style.fontSize = "1em"
+              getById("choice" + correctButton).style.fontSize = "0.8em"
+            }
+
+            else if (chosenAction == 14 || chosenAction == 15) {
+              getById("whoWon").innerHTML = "Click The Largest Button"
+              getById("choice1").style.fontSize = "1.5em"
+              getById("choice2").style.fontSize = "1.2em"
+              getById("choice3").style.fontSize = "1em"
+              getById("choice" + correctButton).style.fontSize = "1.7em"
+            }
+
+            else if (chosenAction == 16 || chosenAction == 17) {
+              getById("whoWon").innerHTML = "Click The Most Visible Button"
+              getById("choice1").style.opacity = 0.6
+              getById("choice2").style.opacity = 0.7
+              getById("choice3").style.opacity = 0.5
+              getById("choice" + correctButton).style.opacity = 0.9
             }
           }
 
@@ -488,18 +537,34 @@
       getById("choice2").innerHTML = "Button"
       getById("choice3").innerHTML = "Button"
       getById("round").style.display = "inline"
+      getById("choice1").style.fontSize = "1.3em"
+      getById("choice2").style.fontSize = "1.3em"
+      getById("choice3").style.fontSize = "1.3em"
+      getById("choice1").style.opacity = 1
+      getById("choice2").style.opacity = 1
+      getById("choice3").style.opacity = 1
       
       clearTimeout(timeout)
     }
 
     function speedUpGame() {
-      if (playerCards.length >= 39 && !hasSpedUp) {
+      if (playerCards.length >= 35 && !hasSpedUp) {
         alert("The Game Is Speeding Up!")
         hasSpedUp = true
         switch (difficulty) {
-          case (0): timeToTake = 1200; break
-          case (1): timeToTake = 1000; break
-          case (2): timeToTake = 800; break
+          case (0): timeToTake = 1100; break
+          case (1): timeToTake = 900; break
+          case (2): timeToTake = 700; break
+        }
+      }
+
+      if (playerCards.length >= 46 && !hasSpedUpAgain) {
+        alert("The Game Is Speeding Up Again!")
+        hasSpedUpAgain = true
+        switch (difficulty) {
+          case (0): timeToTake = 1050; break
+          case (1): timeToTake = 850; break
+          case (2): timeToTake = 650; break
         }
       }
     }
@@ -546,6 +611,31 @@
 
   </div>
 
+  <div id="skillModeAbout" style="display: none;">
+    <img src="favicon.ico" style="width: 7em; image-rendering: pixelated;">
+    <h1 style="font-size: 5em; margin-top: 0em; margin-bottom: 0em;">Skill Mode</h1>
+    <button class="optionButton" onclick="RottingExtension.setCurrentView('main'); firstRound()">Go Back</button>
+    <p style="font-size: 2em; margin-bottom: 20px; margin-top: 20px;">In Skill Mode, The Card Is Not Got Given To Who Has The Higher Value</p>
+    <p style="font-size: 2em; margin-bottom: 20px; margin-top: 20px;">Instead, You Get The Card If You Correctly Complete A Short Challenge Within A Time Limit</p>
+    <p style="font-size: 2em; margin-bottom: 20px; margin-top: 20px;">If You Fail, The CPU Gets The Card</p>
+    <button class="optionButton" onclick="warExclusiveAllChallenges.show()">Show All Challenges</button>
+  </div>
+
+  <div id="challenges" style="display: none;">
+    <img src="favicon.ico" style="width: 7em; image-rendering: pixelated;">
+    <button class="optionButton" onclick="warExclusiveSkilLMode.show()">Go Back</button>
+    <h1 style="font-size: 5em; margin-top: 0em; margin-bottom: 0em;">All Challenges</h1>
+    <p style="font-size: 2em; margin-bottom: 20px; margin-top: 20px;">Click The Color Button</p>
+    <p style="font-size: 2em; margin-bottom: 20px; margin-top: 20px;">Click The Number Button</p>
+    <p style="font-size: 2em; margin-bottom: 20px; margin-top: 20px;">Click The Button With The Word</p>
+    <p style="font-size: 2em; margin-bottom: 20px; margin-top: 20px;">Do Nothing</p>
+    <p style="font-size: 2em; margin-bottom: 20px; margin-top: 20px;">Click Any Button</p>
+    <p style="font-size: 2em; margin-bottom: 20px; margin-top: 20px;">Click The Least Visible Button</p>
+    <p style="font-size: 2em; margin-bottom: 20px; margin-top: 20px;">Click The Smallest Button</p>
+    <p style="font-size: 2em; margin-bottom: 20px; margin-top: 20px;">Click The Largest Button</p>
+    <p style="font-size: 2em; margin-bottom: 20px; margin-top: 20px;">Click The Most Visible Button</p>
+  </div>
+
   <div id="main">
   <img src="favicon.ico" style="width: 7em; image-rendering: pixelated;">
   <h1 id="iHaveACrushOn" style="margin-top: 0em; margin-bottom: 10px;">War</h1>
@@ -577,28 +667,28 @@
     </div>
 
     <div id="easyDiff" style="position: relative; text-align: center; display: none;">
-      <img style="image-rendering: pixelated;" onclick="difficulty = 0; firstRound()" class="gameOptionCards" src="../playingcardback.png">
+      <img style="image-rendering: pixelated;" onclick="difficulty = 0; checkIfPlayedSkillMode()" class="gameOptionCards" src="../playingcardback.png">
       <h3 style="font-size: 2.5em; color: black; " class="centerText">Easy</h3>
     </div>
 
     <div id="normalDiff" style="position: relative; text-align: center; display: none;">
-      <img style="image-rendering: pixelated;" onclick="difficulty = 1; firstRound()" class="gameOptionCards" src="../playingcardback.png">
+      <img style="image-rendering: pixelated;" onclick="difficulty = 1; checkIfPlayedSkillMode()" class="gameOptionCards" src="../playingcardback.png">
       <h3 style="font-size: 2.5em; color: black; " class="centerText">Normal</h3>
     </div>
 
     <div id="hardDiff" style="position: relative; text-align: center; display: none;">
-      <img style="image-rendering: pixelated;" onclick="difficulty = 2; firstRound()" class="gameOptionCards" src="../playingcardback.png">
+      <img style="image-rendering: pixelated;" onclick="difficulty = 2; checkIfPlayedSkillMode()" class="gameOptionCards" src="../playingcardback.png">
       <h3 style="font-size: 2.5em; color: black; " class="centerText">Hard</h3>
     </div>
   </div>
 
-  <button style="display: none;" id="round" onclick="firstRound()" class="optionButton">Start</button>
-  <button style="display: none;" id="choice1" class="optionButton">Button</button>
-  <button style="display: none;" id="choice2" class="optionButton">Button</button>
-  <button style="display: none;" id="choice3" class="optionButton">Button</button>
-  <button style="display: none; background-color: red !important;" id="choice4" class="optionButton">Button</button>
-  <button style="display: none; background-color: blue !important;" id="choice5" class="optionButton">Button</button>
-  <button style="display: none; background-color: green !important;" id="choice6" class="optionButton">Button</button>
+  <button style="display: none; font-size: 1.3em" id="round" onclick="firstRound()" class="optionButton">Start</button>
+  <button style="display: none; font-size: 1.3em" id="choice1" class="optionButton">Button</button>
+  <button style="display: none; font-size: 1.3em" id="choice2" class="optionButton">Button</button>
+  <button style="display: none; font-size: 1.3em" id="choice3" class="optionButton">Button</button>
+  <button style="display: none; font-size: 1.3em; background-color: red !important;" id="choice4" class="optionButton">Button</button>
+  <button style="display: none; font-size: 1.3em; background-color: blue !important;" id="choice5" class="optionButton">Button</button>
+  <button style="display: none; font-size: 1.3em; background-color: green !important;" id="choice6" class="optionButton">Button</button>
   <button id="chatButton" style="display: none;" class="optionButton" onclick="chat.show()">Chat</button>
   
   <h1 id="host" style="display: none;"></h1>
@@ -646,9 +736,7 @@
   <script src="pleblib.js"></script>
   <script src="hostlib.js"></script>
   <script src="multiplayer.js"></script>
-  <script src="../utility.js"></script>
   <script src="../generatecard.js"></script>
-  <script src="../index.js"></script>
   <script src="../rotextensions.js"></script>
   <script>
     let start = startGame(playerCards, cpuCards, 26)
