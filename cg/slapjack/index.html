@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Slapjack</title>
   <style id="styleTag"></style>
+  <script src="../utility.js"></script>
+  <script src="../index.js"></script>
   <link rel="stylesheet" href="slapjack.css">
   <link rel="stylesheet" href="../general.css">
   <link rel="icon" type="image/icon-x" href="favicon.ico">
@@ -30,6 +32,7 @@
     }
 
     function showCard(card, id) {
+      if (!card) {return}
       if (card[1] == 11) {
         getById(id).innerHTML += `
           <img id='cardImg' class='hoverCard' onclick='rightSlap()' src='../cards/${card[0]}-${card[1]}.svg'>
@@ -49,6 +52,7 @@
 
     function wrongSlap() {
       alert("That Was Not A Jack! You Lose 3 Cards")
+      if (host) {sendTo(host, JSON.stringify({msg: "wrongSlap"}))}
       for (let i = 0; i < 3; i++) {
         if (playerCards.length > 0) {
           cpuCards.push(playerCards[0])
@@ -67,7 +71,7 @@
       firstCardSet = []
       secondCardSet = []
 
-      for (let i = 1; i <= 26; i++) {
+      for (let i = 1; i <= 6; i++) {
         firstCardSet.push(generateCard())
       }
 
@@ -160,6 +164,8 @@
     }
 
     async function playerPlaceCard() {
+      if (playerCards.length < 1) {return}
+      
       let card = playerCards[0]
       removeItem(playerCards, card)
 
@@ -171,7 +177,7 @@
       hideCard("card")
       showCard(card, "card")
 
-      if (card[1] == 11) {
+      if (card && card[1] == 11) {
         await enterCPUSlap()
       }
     }
@@ -420,6 +426,7 @@
   </div>
 
    <div style="display: none;" id="multiplayerMenu">
+      <h2 style="margin-bottom: 0.7em; margin-top: 5px;">Notice: Lag May Affect Slapping The Jack</h2>
       <h2 style="margin-bottom: 0.7em; margin-top: 5px;" id="whatDoing">Creating New Session</h2>
       <div style="margin-bottom: 2em;">
         <input type="button" id="new" name="joinOrNew" value="New Session" class="optionButton" style="display: none;">
@@ -504,12 +511,10 @@
   </script>
 
   <script src="../generatecard.js"></script>
-  <script src="../utility.js"></script>
   <script src="../pearnet.js"></script>
   <script src="multiplayer.js"></script>
   <script src="hostlib.js"></script>
   <script src="pleblib.js"></script>
-  <script src="../index.js"></script>
   <script src="../rotextensions.js"></script>
 </body>
 </html>
